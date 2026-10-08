@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BuyfromGAB ecommerce administration demo dashboard.">
+  <meta name="theme-color" content="#f5f6f8">
+  <title>Admin dashboard – BuyfromGAB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="login-screen" class="login-screen">
+    <div class="login-visual">
+      <a class="login-brand" href="../index.html"><span class="brand-mark">G</span> BuyfromGAB</a>
+      <div class="login-message">
+        <span class="eyebrow">STORE MANAGEMENT</span>
+        <h1>Everything your store needs, in one place.</h1>
+        <p>Keep your products, orders, and customers moving forward with a clearer view of your business.</p>
+      </div>
+      <div class="login-visual-footer">A demo workspace for BuyfromGAB</div>
+    </div>
+    <div class="login-panel">
+      <form class="login-form" id="login-form">
+        <span class="eyebrow">WELCOME BACK</span>
+        <h2>Sign in to your store</h2>
+        <p class="login-copy">Use the demo credentials to explore the admin dashboard.</p>
+        <label class="form-field">Email address
+          <input name="email" type="email" autocomplete="username" required value="admin@buyfromgab.com">
+        </label>
+        <label class="form-field">Password
+          <span class="password-field"><input name="password" type="password" autocomplete="current-password" required value="GabDemo2026!"><button class="password-toggle" type="button" aria-label="Show password" data-password-toggle>Show</button></span>
+        </label>
+        <p class="login-error" id="login-error" role="alert" hidden></p>
+        <button class="primary-button login-submit" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        <div class="demo-credentials"><strong>Demo access</strong><span>Email: admin@buyfromgab.com</span><span>Password: GabDemo2026!</span></div>
+        <a class="back-to-store" href="../index.html">← Back to storefront</a>
+        <p class="demo-notice">Demo only: sign-in is browser-side and is not suitable for a live store.</p>
+      </form>
+    </div>
+  </div>
+
+  <div class="app-shell" id="app-shell" hidden>
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="index.html"><span class="brand-mark">G</span><span>BuyfromGAB<small>STORE ADMIN</small></span></a>
+      <div class="store-switcher"><span class="store-avatar">B</span><span><strong>BuyfromGAB</strong><small>Ghana · GHS</small></span><span class="switch-chevron">⌄</span></div>
+      <p class="nav-label">WORKSPACE</p>
+      <nav class="side-nav" aria-label="Admin navigation">
+        <button class="nav-item active" type="button" data-view="overview"><span class="nav-icon" data-icon="overview"></span>Overview</button>
+        <button class="nav-item" type="button" data-view="orders"><span class="nav-icon" data-icon="orders"></span>Orders<span class="nav-count" id="pending-count">0</span></button>
+        <button class="nav-item" type="button" data-view="products"><span class="nav-icon" data-icon="products"></span>Products</button>
+        <button class="nav-item" type="button" data-view="customers"><span class="nav-icon" data-icon="customers"></span>Customers</button>
+        <button class="nav-item" type="button" data-view="analytics"><span class="nav-icon" data-icon="analytics"></span>Analytics</button>
+      </nav>
+      <p class="nav-label nav-label-bottom">PREFERENCES</p>
+      <nav class="side-nav">
+        <button class="nav-item" type="button" data-view="settings"><span class="nav-icon" data-icon="settings"></span>Settings</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <a class="sidebar-help" href="../help/"><span class="help-icon">?</span><span><strong>Need a hand?</strong><small>Visit the help center</small></span><span class="external-arrow">↗</span></a>
+        <div class="admin-profile"><span class="profile-avatar">GA</span><span><strong>Gabriella Admin</strong><small>Store owner</small></span><button class="profile-menu" data-action="logout" type="button" aria-label="Sign out">↗</button></div>
+      </div>
+    </aside>
+
+    <div class="sidebar-scrim" id="sidebar-scrim"></div>
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu" type="button" id="mobile-menu" aria-label="Open navigation">☰</button>
+        <div class="breadcrumbs"><span>Store</span><span class="crumb-slash">/</span><strong id="page-crumb">Overview</strong></div>
+        <div class="topbar-actions">
+          <a class="view-store" href="../index.html" target="_blank" rel="noopener"><span aria-hidden="true">↗</span> View store</a>
+          <button class="icon-button" type="button" aria-label="Notifications"><span data-icon="bell"></span><i class="notification-dot"></i></button>
+          <button class="top-profile" type="button" data-action="logout" aria-label="Sign out">GA</button>
+        </div>
+      </header>
+      <div class="page-content" id="page-content"></div>
+      <footer class="admin-footer"><span>© <span id="current-year"></span> BuyfromGAB Admin</span><span>Demo workspace <i></i> Data saved in this browser</span></footer>
+    </main>
+  </div>
+
+  <dialog class="product-dialog" id="product-dialog">
+    <form id="product-form">
+      <div class="dialog-heading"><div><span class="eyebrow">CATALOG</span><h2 id="product-dialog-title">Add product</h2></div><button type="button" class="dialog-close" data-close-dialog aria-label="Close">×</button></div>
+      <input name="productId" type="hidden">
+      <label class="form-field">Product name<input name="name" type="text" maxlength="100" required placeholder="e.g. Everyday wireless headphones"></label>
+      <div class="form-row">
+        <label class="form-field">Category<select name="category" required><option value="Toys">Kids toys</option><option value="Electronics">Electronics</option><option value="Pharmacy">Pharmacy</option><option value="Clothes">Clothes</option><option value="Beauty">Beauty</option><option value="Home & kitchen">Home &amp; kitchen</option></select></label>
+        <label class="form-field">Price (GHS)<input name="price" type="number" min="0" step="0.01" required placeholder="0.00"></label>
+      </div>
+      <div class="form-row">
+        <label class="form-field">Inventory<input name="stock" type="number" min="0" step="1" required placeholder="0"></label>
+        <label class="form-field">Status<select name="status"><option value="Active">Active</option><option value="Draft">Draft</option></select></label>
+      </div>
+      <label class="form-field">Product image URL <span class="optional-label">Optional</span><input name="image" type="url" placeholder="https://"></label>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button type="submit" class="primary-button">Save product</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js" defer></script>
+</body>
+</html>
