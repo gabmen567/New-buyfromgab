@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="BuyfromGAB ecommerce administration demo dashboard.">
-  <meta name="theme-color" content="#f5f6f8">
+  <meta name="theme-color" content="#16233b">
   <title>Admin dashboard – BuyfromGAB</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="classic.css">
 </head>
 <body>
   <div id="login-screen" class="login-screen">
@@ -49,8 +50,9 @@
       <p class="nav-label">WORKSPACE</p>
       <nav class="side-nav" aria-label="Admin navigation">
         <button class="nav-item active" type="button" data-view="overview"><span class="nav-icon" data-icon="overview"></span>Overview</button>
+        <a class="nav-item storefront-editor-link" href="storefront.html"><span class="nav-icon" data-icon="products"></span>Edit storefront</a>
         <button class="nav-item" type="button" data-view="orders"><span class="nav-icon" data-icon="orders"></span>Orders<span class="nav-count" id="pending-count">0</span></button>
-        <button class="nav-item" type="button" data-view="products"><span class="nav-icon" data-icon="products"></span>Products</button>
+        <button class="nav-item" type="button" data-view="products"><span class="nav-icon" data-icon="products"></span>Demo inventory</button>
         <button class="nav-item" type="button" data-view="customers"><span class="nav-icon" data-icon="customers"></span>Customers</button>
         <button class="nav-item" type="button" data-view="analytics"><span class="nav-icon" data-icon="analytics"></span>Analytics</button>
       </nav>
@@ -67,11 +69,15 @@
     <div class="sidebar-scrim" id="sidebar-scrim"></div>
     <main class="main-area">
       <header class="topbar">
-        <button class="mobile-menu" type="button" id="mobile-menu" aria-label="Open navigation">☰</button>
+        <button class="mobile-menu" type="button" id="mobile-menu" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">☰</button>
         <div class="breadcrumbs"><span>Store</span><span class="crumb-slash">/</span><strong id="page-crumb">Overview</strong></div>
         <div class="topbar-actions">
+          <span class="workspace-label">Demo workspace</span>
           <a class="view-store" href="../index.html" target="_blank" rel="noopener"><span aria-hidden="true">↗</span> View store</a>
-          <button class="icon-button" type="button" aria-label="Notifications"><span data-icon="bell"></span><i class="notification-dot"></i></button>
+          <div class="notification-wrap">
+            <button class="icon-button" id="notifications-toggle" type="button" aria-label="Store notifications" aria-expanded="false" aria-controls="notifications-panel"><span data-icon="bell"></span><i class="notification-dot"></i></button>
+            <section class="notifications-panel" id="notifications-panel" aria-label="Store notifications" hidden></section>
+          </div>
           <button class="top-profile" type="button" data-action="logout" aria-label="Sign out">GA</button>
         </div>
       </header>

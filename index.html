@@ -6,11 +6,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="BuyfromGAB: everything you need in one place. Food, home and kitchen, bathroom and plumbing, medication, electronics, clothing, personal care and toys. Order on WhatsApp.">
 <title>BuyfromGAB – Shop by category</title>
+<script src="store-config.js" defer></script>
+<script src="catalog-defaults.js" defer></script>
+<script src="store-content.js" defer></script>
 <script src="app.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="classic.css">
 </head>
 <body>
 <a class="skip-link" href="#top">Skip to main content</a>
@@ -186,7 +190,15 @@
       <span class="count" id="result-count" aria-live="polite"></span>
     </div>
     <div class="m-cat" id="m-cat" hidden>
-      <nav class="m-tabs" id="m-tabs" aria-label="Categories"></nav>
+      <div class="category-navigation">
+        <button class="category-arrow" id="categories-prev" type="button" aria-label="Scroll categories left" aria-controls="m-tabs" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+        </button>
+        <nav class="m-tabs" id="m-tabs" aria-label="Categories" tabindex="0"></nav>
+        <button class="category-arrow" id="categories-next" type="button" aria-label="Scroll categories right" aria-controls="m-tabs" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+        </button>
+      </div>
       <div class="m-body">
         <nav class="m-rail" id="m-rail" aria-label="Sub-categories"></nav>
         <div class="m-main">
@@ -253,8 +265,8 @@
         <div class="f-social" id="f-social" aria-label="Follow us"></div>
       </div>
       <div class="f-connect">
-        <h2>Stay Connected</h2>
-        <p>Subscribe to our newsletter for exclusive offers and updates.</p>
+        <h2>A little more from GAB.</h2>
+        <p>Leave your email, then send your request on WhatsApp for offers and updates.</p>
         <form class="f-form" id="f-form">
           <label class="sr-only" for="f-email">Your email address</label>
           <input id="f-email" type="email" required placeholder="Your email address" autocomplete="email">
@@ -264,6 +276,14 @@
         <a class="f-contact" href="https://wa.me/233545359058" target="_blank" rel="noopener"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>Chat with us: +233 54 535 9058</a>
       </div>
     </div>
+    <nav class="footer-shortcuts" aria-label="Customer care">
+      <a href="#/about">Our story</a>
+      <a href="help/">Help centre</a>
+      <a href="shipping/">Delivery</a>
+      <a href="returns/">Returns</a>
+      <a href="track-order/">Track an order</a>
+      <a href="#/contact">Contact us</a>
+    </nav>
     <div class="f-bottom">
       <p>© <span id="year"></span> BuyfromGAB. All rights reserved.</p>
       <p class="f-legal"><a href="#/privacy">Privacy Policy</a><span aria-hidden="true">|</span><a href="#/terms">Terms of Service</a></p>
@@ -308,11 +328,7 @@
 <div class="toast" id="toast" role="status"></div>
 
 <div class="chat-launchers" aria-label="Chat options">
-  <button class="chat-launcher ai-chat-launcher" type="button" disabled title="AI chat coming soon">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a8 8 0 0 0-8 8v2a3 3 0 0 0 3 3h1v-6H7a5 5 0 0 1 10 0h-1v6h1a3 3 0 0 0 3-3v-2a8 8 0 0 0-8-8Z"/><path d="M9 19h4a2 2 0 0 0 2-2"/></svg>
-    <span>AI Chat <small>Coming soon</small></span>
-  </button>
-  <a class="chat-launcher whatsapp-launcher" href="https://wa.me/233545359058" target="_blank" rel="noopener">
+  <a class="chat-launcher whatsapp-launcher" href="https://wa.me/233545359058" target="_blank" rel="noopener" aria-label="Chat with BuyfromGAB on WhatsApp">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.5-4.7a8.5 8.5 0 1 1 16-4.1Z"/><path d="M8.5 8.3c.4 2.5 2.7 4.8 5.2 5.2l1.2-1.2 2 .9c-.2 1.4-1.1 2.1-2.5 2.1-3.5-.2-7.5-4.2-7.7-7.7 0-1.4.7-2.3 2.1-2.5l.9 2-1.2 1.2Z"/></svg>
     <span>Chat on WhatsApp</span>
   </a>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#16233b">
+  <title>Storefront editor – BuyfromGAB</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="classic.css">
+  <link rel="stylesheet" href="storefront.css">
+  <script src="../store-config.js" defer></script>
+  <script src="../catalog-defaults.js" defer></script>
+  <script src="../store-content.js" defer></script>
+  <script src="storefront.js" defer></script>
+</head>
+<body>
+  <header class="editor-topbar"><a class="editor-brand" href="index.html"><span class="brand-mark">G</span> BuyfromGAB <small>STOREFRONT STUDIO</small></a><a class="secondary-button editor-back" href="index.html">Back to dashboard</a></header>
+  <main class="editor-gate" id="editor-gate">
+    <span class="eyebrow">YOUR STORE, YOUR WAY</span>
+    <h1>A beautiful store.<br>Made yours.</h1>
+    <p>Edit your homepage, category artwork, banners and products from one place. Save a draft, preview it, then publish when you’re ready.</p>
+    <form id="editor-login" hidden>
+      <label class="form-field">Administrator email<input name="email" type="email" autocomplete="username" required></label>
+      <label class="form-field">Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <button class="primary-button" type="submit">Sign in to edit</button>
+    </form>
+    <div id="local-entry" hidden><p class="local-note">Local preview mode: edits appear only in this browser. Connect your store to publish for every visitor.</p><button class="primary-button" id="open-local-editor" type="button">Open local editor</button></div>
+    <p class="editor-error" id="login-message" role="alert"></p>
+  </main>
+  <div id="editor-workspace" hidden>
+    <div class="editor-heading"><div><span class="eyebrow" id="editor-mode"></span><h1>Make it your own.</h1><p>Your content, with room to get it just right.</p></div><div class="editor-actions"><button class="secondary-button" id="save-draft" type="button">Save draft</button><button class="secondary-button" id="preview-draft" type="button">Preview</button><button class="primary-button" id="publish-store" type="button">Publish store</button><button class="secondary-button" id="editor-signout" type="button" hidden>Sign out</button></div></div>
+    <p class="editor-status" id="editor-status" role="status" aria-live="polite"></p>
+    <div class="editor-layout">
+      <nav class="editor-nav" aria-label="Content sections">
+        <button type="button" data-section="homepage" aria-current="page"><span>01</span> Homepage</button>
+        <button type="button" data-section="categories"><span>02</span> Categories</button>
+        <button type="button" data-section="banners"><span>03</span> Category banners</button>
+        <button type="button" data-section="promotions"><span>04</span> Promotional banners</button>
+        <button type="button" data-section="products"><span>05</span> Products</button>
+        <div class="editor-tools"><button type="button" id="export-content">Download backup</button><label class="import-label">Restore a backup<input type="file" id="import-content" accept="application/json,.json"></label></div>
+      </nav>
+      <section class="editor-content" id="content-fields" aria-label="Content editor"></section>
+    </div>
+  </div>
+</body>
+</html>

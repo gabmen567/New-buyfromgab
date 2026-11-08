@@ -1,0 +1,214 @@
+/* Match the store's classic palette while keeping dense admin tools readable. */
+:root {
+  --radius-card: 22px;
+  --radius-control: 14px;
+  --canvas: #e8e9f2; --white: #ffffff; --ink: #16233b; --muted: #5e677b;
+  --line: #cfd4e2; --nav: #16233b; --nav-muted: #b6c1d6;
+  --accent: #246637; --accent-dark: #1c522c; --accent-soft: #d4f5db;
+  --shadow: 0 4px 20px rgba(22,35,59,.04);
+}
+.page-heading h1, .login-message h1, .login-panel h2, .dialog-heading h2 {
+  font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.025em;
+}
+.page-heading h1 { font-size: clamp(28px, 3vw, 36px); }
+.sidebar { background: var(--nav); }
+.nav-item { min-height: 44px; font-size: 13px; border-radius: var(--radius-control); }
+.nav-item.active { background: #4cda68; color: #16233b; box-shadow: none; }
+.sidebar-brand .brand-mark { background: #4cda68; color: #16233b; }
+.sidebar-brand { font-family: Georgia, serif; font-size: 20px; font-weight: 400; }
+.nav-label, .store-switcher small, .admin-profile small, .sidebar-help small { color: #b6c1d6; }
+.topbar { background: var(--white); }
+.metric-card, .panel, .customer-card, .settings-card, .product-dialog { border-radius: var(--radius-card); }
+.primary-button, .secondary-button { min-height: 44px; border-radius: var(--radius-control); box-shadow: none; }
+.primary-button, .brand-mark { background: #4cda68; color: #16233b; }
+.primary-button:hover { background: #65e37d; color: #16233b; }
+.metric-value { font-variant-numeric: tabular-nums; }
+.chart-line, .chart-point, .chart-tooltip { stroke: var(--accent); }
+.page-heading p, .view-store, .breadcrumbs { font-size: 13px; }
+.login-visual { background: #16233b; }
+.demo-credentials { border-color: #bbdfc6; background: #e8f8ec; color: #246637; }
+.demo-credentials strong { color: #16233b; }
+.login-panel input:focus, .form-field input:focus, .form-field select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(76,218,104,.12); }
+:focus-visible { outline: 3px solid #246637; outline-offset: 3px; }
+@media (max-width: 580px) {
+  input, select, textarea { font-size: 16px !important; }
+  .icon-button, .mobile-menu { min-width: 44px; min-height: 44px; }
+  .topbar-actions { gap: 3px; }
+}
+
+/* A classic workspace: generous type, quiet surfaces and clear daily tasks. */
+body { line-height: 1.6; }
+.sidebar { width: 260px; padding: 30px 18px 20px; }
+.main-area { margin-left: 260px; }
+.sidebar-brand { gap: 12px; font-size: 23px; }
+.sidebar-brand small { margin-top: 6px; font-size: 9px; letter-spacing: .2em; color: #b6c1d6; }
+.store-switcher { margin-top: 30px; border-radius: 16px; padding: 14px 12px; }
+.store-switcher strong, .admin-profile strong, .sidebar-help strong { font-size: 12px; }
+.store-switcher small, .admin-profile small, .sidebar-help small { font-size: 11px; }
+.nav-label { font-size: 10px; letter-spacing: .15em; }
+.side-nav { gap: 7px; }
+.nav-item { height: 48px; padding-inline: 14px; }
+.storefront-editor-link { text-decoration: none; border: 1px solid #4cda68; color: #8ceba0; }
+.nav-item.active .nav-count { background: #16233b; color: #ffffff; }
+.sidebar-help { padding-block: 16px; border-radius: 16px; }
+.topbar { height: 78px; padding-inline: clamp(24px, 3vw, 48px); }
+.topbar-actions { gap: 16px; }
+.workspace-label { border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; color: var(--muted); font-size: 11px; }
+.top-profile { width: 38px; height: 38px; background: #e8e9f2; color: #16233b; }
+.icon-button { width: 42px; height: 42px; background: #f3f4f9; border-radius: 14px; }
+.notification-dot { background: #4cda68; right: 9px; top: 8px; }
+.page-content { padding: 36px clamp(24px, 3vw, 48px) 44px; }
+.page-heading { margin-bottom: 28px; align-items: center; }
+.page-heading h1 { margin-bottom: 7px; font-size: clamp(30px, 3vw, 40px); }
+.page-heading h1:focus { outline: none; }
+.page-heading p { font-size: 13px; }
+.primary-button, .secondary-button { padding-inline: 18px; font-size: 12px; }
+.secondary-button { color: #16233b; background: #ffffff; border-color: var(--line); }
+.secondary-button:hover { background: #f3f4f9; }
+.overview-welcome { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(250px, .8fr); gap: 40px; margin-bottom: 26px; padding: clamp(26px, 3vw, 42px); border-radius: 26px; background: #16233b; color: #ffffff; }
+.overview-welcome .eyebrow { color: #9fb6bf; font-size: 10px; letter-spacing: .2em; }
+.overview-welcome h2 { font: 400 clamp(30px, 3vw, 43px)/1.12 Georgia, serif; letter-spacing: -.025em; margin: 17px 0; }
+.overview-welcome p { max-width: 46ch; color: #c1cbdc; font-size: 13px; line-height: 1.8; }
+.welcome-link { margin-top: 8px; padding: 0 0 5px; border: 0; border-bottom: 1px solid #4cda68; background: none; color: #4cda68; font: 600 13px 'DM Sans', sans-serif; }
+.welcome-link span { margin-left: 14px; }
+.welcome-tasks { display: grid; gap: 12px; align-content: center; }
+.welcome-tasks button { display: flex; gap: 14px; align-items: center; width: 100%; padding: 16px; border: 1px solid #354563; border-radius: 18px; background: #20314d; color: #ffffff; text-align: left; }
+.welcome-tasks button:hover { border-color: #4cda68; background: #263d54; }
+.welcome-tasks button > span:last-child { margin-left: auto; color: #4cda68; }
+.task-icon { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 13px; background: #30475b; color: #82e696; }
+.task-icon svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.welcome-tasks strong, .welcome-tasks small { display: block; }
+.welcome-tasks strong { font-size: 14px; font-weight: 600; }
+.welcome-tasks small { color: #b6c1d6; font-size: 11px; margin-top: 3px; }
+.metric-grid { gap: 18px; margin-bottom: 26px; }
+.metric-card { padding: 23px 20px; background: #ffffff; }
+.metric-top { font-size: 12px; color: #5e677b; }
+.metric-icon { width: 36px; height: 36px; border-radius: 12px; }
+.metric-icon svg { width: 19px; height: 19px; }
+.metric-value { font-size: clamp(23px, 2.1vw, 31px); font-weight: 700; letter-spacing: -.04em; margin-top: 20px; }
+.metric-foot { font-size: 11px; flex-wrap: wrap; }
+.chart-layout, .lower-grid, .analytics-grid { gap: 22px; margin-bottom: 26px; }
+.panel-heading { padding: 24px 24px 0; gap: 16px; }
+.panel-heading h2, .panel-title, .settings-form h2 { font: 400 23px/1.3 Georgia, serif; color: #16233b; }
+.panel-heading p { color: #5e677b; font-size: 12px; line-height: 1.6; }
+.panel-heading .text-link { font-size: 12px; background: none; border: 0; padding-block: 8px; }
+.chart-wrap { height: 280px; padding: 20px 22px; }
+.chart-label { fill: #5e677b; font-size: 10px; }
+.chart-area { fill: rgba(76,218,104,.12); }
+.donut-area { padding: 18px 26px 26px; }
+.legend-row, .legend-row strong { font-size: 12px; }
+.data-table th { font-size: 10px; padding: 16px 18px; color: #5e677b; background: #f7f8fb; border-color: var(--line); }
+.data-table td { font-size: 12px; height: 65px; padding: 12px 18px; line-height: 1.5; }
+.data-table tbody tr:hover { background: #f4fbf6; }
+.data-table-wrap { margin-top: 18px; }
+.mini-avatar { width: 32px; height: 32px; font-size: 10px; background: #e8e9f2; color: #16233b; }
+.status-pill { padding: 5px 10px; font-size: 10px; }
+.activity-list { padding: 8px 24px 22px; }
+.activity-item { gap: 14px; padding-block: 18px; }
+.activity-copy { font-size: 12px; line-height: 1.65; }
+.activity-copy small { font-size: 10px; color: #687388; }
+.toolbar { gap: 12px; }
+.select-control, .date-chip { min-height: 42px; border-radius: 12px; color: #5e677b; font-size: 12px; }
+.toolbar .select-control { height: 42px; }
+.search-control input { height: 44px; border-radius: 14px; font-size: 13px; }
+.search-control svg { top: 14px; }
+.product-thumb { width: 45px; height: 45px; border-radius: 13px; background: #e8e9f2; }
+.product-info strong { font-size: 12px; }
+.product-info small { font-size: 10px; color: #687388; }
+.small-action, .inline-status { min-height: 36px; font-size: 11px; border-radius: 10px; }
+.table-pagination { gap: 14px; flex-wrap: wrap; font-size: 11px; padding: 18px; color: #5e677b; }
+.customer-card { padding: 24px; }
+.customer-card span, .top-product-name, .top-product-total { font-size: 12px; }
+.top-product-name small { font-size: 11px; }
+.top-products { padding: 26px; gap: 22px; }
+.settings-form { padding: 28px; }
+.settings-form > p, .demo-card p { font-size: 12px; color: #5e677b; }
+.demo-card { border-radius: 22px; padding: 26px; background: #f3f4fa; border-color: var(--line); }
+.demo-card h3 { color: #16233b; font: 400 22px Georgia, serif; }
+.form-field { font-size: 12px; color: #5e677b; }
+.form-field input, .form-field select { min-height: 48px; border-radius: 12px; font-size: 14px; }
+.login-visual { background: radial-gradient(ellipse at bottom left, #294666, #16233b 65%); }
+.login-message h1 { font-size: clamp(40px, 4.5vw, 66px); }
+.login-panel h2 { font-size: 36px; }
+.login-copy { font-size: 14px; line-height: 1.7; }
+.login-submit { margin-top: 28px; min-height: 50px; }
+.login-visual-footer { color: #b6c1d6; }
+/* Compact sign-in layout for phones and tablets, including landscape screens. */
+@media (max-width: 850px) {
+  .login-screen { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 100svh; background: var(--canvas); }
+  .login-screen .login-visual { min-height: 155px; padding: calc(24px + env(safe-area-inset-top, 0px)) 24px 60px; justify-content: flex-start; }
+  .login-visual::after { width: 220px; height: 220px; right: -100px; bottom: -150px; }
+  .login-brand { font-family: Georgia, serif; font-size: 24px; font-weight: 400; }
+  .login-brand .brand-mark { width: 40px; height: 40px; background: #4cda68; color: #16233b; }
+  .login-message, .login-visual-footer { display: none; }
+  .login-screen .login-panel { position: relative; z-index: 1; display: block; align-self: start; width: min(480px, calc(100% - 32px)); margin: -36px auto 28px; padding: 28px 24px calc(24px + env(safe-area-inset-bottom, 0px)); border: 1px solid var(--line); border-radius: 24px; background: #ffffff; box-shadow: 0 12px 36px rgba(22,35,59,.06); }
+  .login-form { width: 100%; }
+  .login-screen .login-panel h2 { font-size: clamp(28px, 5vw, 34px); line-height: 1.2; margin-top: 12px; }
+  .login-copy { margin-bottom: 24px; font-size: 13px; }
+  .login-form .form-field { margin-block: 18px; font-size: 13px; }
+  .login-form .form-field input { min-height: 52px; font-size: 16px; scroll-margin-block: 24px; }
+  .login-form .password-field input { padding-right: 70px; }
+  .login-form .password-toggle { top: 4px; right: 6px; min-width: 56px; height: 44px; border-radius: 10px; font-size: 12px; }
+  .login-form .login-submit { min-height: 52px; margin-top: 24px; font-size: 15px; }
+  .login-form .demo-credentials { border-radius: 14px; padding: 14px; font-size: 12px; overflow-wrap: anywhere; }
+  .login-form .demo-notice { margin-bottom: 0; color: #5e677b; font-size: 11px; }
+  .login-form .back-to-store { display: inline-flex; min-height: 44px; align-items: center; margin-top: 12px; font-size: 13px; }
+}
+.admin-footer { font-size: 11px; color: #5e677b; padding-block: 14px; }
+.notification-wrap { position: relative; }
+.notifications-panel { position: absolute; right: 0; top: 54px; width: min(360px, calc(100vw - 32px)); padding: 22px; border: 1px solid var(--line); border-radius: 22px; background: #ffffff; box-shadow: 0 16px 45px rgba(22,35,59,.15); }
+.notifications-panel h2 { font: 400 24px Georgia, serif; margin: 0 0 6px; }
+.notifications-panel > p { color: #5e677b; font-size: 12px; margin: 0 0 16px; }
+.notifications-panel button { display: flex; width: 100%; gap: 12px; align-items: center; text-align: left; padding: 16px 0; border: 0; border-top: 1px solid var(--line); background: transparent; color: #16233b; }
+.notifications-panel button:hover { color: #246637; }
+.notifications-panel svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.notifications-panel strong, .notifications-panel small { display: block; }
+.notifications-panel strong { font-size: 13px; }
+.notifications-panel small { font-size: 11px; color: #5e677b; margin-top: 4px; }
+.notifications-panel b { margin-left: auto; }
+@media (prefers-reduced-motion: no-preference) {
+  .overview-welcome, .metric-card, .panel { animation: admin-arrive .35s ease-out; }
+  @keyframes admin-arrive { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+}
+@media (max-width: 1200px) {
+  .overview-welcome { gap: 24px; grid-template-columns: minmax(0, 1fr) minmax(240px, .9fr); }
+  .chart-layout, .lower-grid { grid-template-columns: minmax(0, 1fr); }
+  .donut-area { display: flex; align-items: center; gap: 30px; }
+  .legend { margin: 0; }
+}
+@media (max-width: 850px) {
+  .sidebar { width: 260px; }
+  .main-area { margin-left: 0; }
+  .topbar { height: 70px; padding-inline: 20px; }
+  .page-content { padding: 28px 20px; }
+  .workspace-label { display: none; }
+}
+@media (max-width: 580px) {
+  .overview-welcome { grid-template-columns: minmax(0, 1fr); padding: 26px; gap: 22px; }
+  .topbar { gap: 8px; padding-inline: 12px; }
+  .breadcrumbs { gap: 6px; font-size: 11px; }
+  .topbar-actions { gap: 6px; }
+  .view-store { font-size: 0; }
+  .view-store span { font-size: 16px; }
+  .top-profile { width: 32px; height: 32px; flex: none; }
+  .overview-welcome h2 { font-size: 36px; }
+  .page-heading { align-items: flex-start; }
+  .page-heading .heading-actions { flex-wrap: wrap; gap: 10px; }
+  .page-heading > .heading-actions .primary-button, .page-heading > .heading-actions .secondary-button { flex: 1; }
+  .metric-grid { gap: 12px; }
+  .metric-card { padding: 18px 14px; }
+  .metric-value { white-space: nowrap; font-size: clamp(16px, 4.6vw, 20px); line-height: 1.3; }
+  .metric-top { font-size: 11px; }
+  .metric-icon { width: 28px; height: 28px; flex: none; }
+  .panel-heading { padding: 20px 18px 0; flex-wrap: wrap; }
+  .panel-heading h2 { font-size: 22px; }
+  .notifications-panel { position: fixed; top: 76px; right: 16px; }
+  .donut-area { gap: 16px; padding: 20px; }
+  .donut-chart { width: 120px; height: 120px; flex: none; }
+  .admin-footer { padding-inline: 20px; }
+  .customer-card { padding: 18px 14px; }
+  .customer-card strong { font-size: 20px; }
+  .login-panel { padding: 36px 24px; }
+  .login-visual { padding: 24px; }
+  .login-message { padding-block: 32px; }
+}

@@ -3,6 +3,10 @@ ecommerce
 
 ## Admin demo
 
+For customer-facing content, open [`admin/storefront.html`](./admin/storefront.html) or choose **Edit storefront**. This separate editor manages the real homepage, category tiles, banners and product catalog, with drafts, previews, image uploads and publishing. See [the editor guide](./admin/STOREFRONT-EDITOR.md) for Supabase setup and the distinction between local publishing and publishing for every visitor.
+
+The admin workspace uses the store's navy, green, and lavender palette with rounded panels and classic serif headings. It includes a responsive overview, order and stock shortcuts, notifications, searchable products and customers, product editing, order status updates, CSV order exports, analytics, and store settings.
+
 The standalone demo dashboard is in [`admin/`](./admin/). With the local static server running, open `http://localhost:8001/admin/`.
 The production site is at https://buyfromgab.vercel.app, and its admin dashboard is at https://buyfromgab.vercel.app/admin/.
 

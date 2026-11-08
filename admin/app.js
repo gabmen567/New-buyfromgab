@@ -123,16 +123,42 @@
     const loggedIn = sessionStorage.getItem(SESSION_KEY) === "true";
     $("#login-screen").hidden = loggedIn;
     $("#app-shell").hidden = !loggedIn;
-    if (loggedIn) renderView(activeView);
+    if (loggedIn) setView(activeView);
   }
 
   function setView(view) {
     activeView = view;
-    $$(".nav-item[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+    $$(".nav-item[data-view]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.view === view);
+      if (button.dataset.view === view) button.setAttribute("aria-current", "page");
+      else button.removeAttribute("aria-current");
+    });
     $("#page-crumb").textContent = ({ overview: "Overview", orders: "Orders", products: "Products", customers: "Customers", analytics: "Analytics", settings: "Settings" })[view] || "Overview";
     $("#sidebar").classList.remove("open");
     $("#sidebar-scrim").classList.remove("visible");
+    $("#mobile-menu").setAttribute("aria-expanded", "false");
+    closeNotifications();
     renderView(view);
+    const title = $(".page-heading h1");
+    if (title) { title.tabIndex = -1; title.focus({ preventScroll: true }); }
+    document.title = `${$("#page-crumb").textContent} – BuyfromGAB Admin`;
+  }
+
+  function closeNotifications() {
+    $("#notifications-panel").hidden = true;
+    $("#notifications-toggle").setAttribute("aria-expanded", "false");
+  }
+
+  function toggleNotifications() {
+    const panel = $("#notifications-panel");
+    if (!panel.hidden) { closeNotifications(); return; }
+    const pending = data.orders.filter(order => ["Pending", "Processing"].includes(order.status)).length;
+    const low = data.products.filter(product => product.status === "Active" && product.stock <= 6).length;
+    panel.innerHTML = `<h2>Needs your attention</h2><p>From your demo store data</p>
+      <button type="button" data-view-link="orders"><span>${icons.orders}</span><span><strong>${pending} ${pending === 1 ? "order" : "orders"} to fulfil</strong><small>Review pending and processing orders</small></span><b aria-hidden="true">↗</b></button>
+      <button type="button" data-view-link="products"><span>${icons.products}</span><span><strong>${low} products running low</strong><small>Check your inventory and stock levels</small></span><b aria-hidden="true">↗</b></button>`;
+    panel.hidden = false;
+    $("#notifications-toggle").setAttribute("aria-expanded", "true");
   }
 
   function heading(title, subtitle, actions = "") {
@@ -164,6 +190,7 @@
     const total = data.orders.length;
     const counts = [
       { name: "Delivered", color: "#20a779", count: data.orders.filter((order) => order.status === "Delivered").length },
+      { name: "Paid", color: "#16233b", count: data.orders.filter((order) => order.status === "Paid").length },
       { name: "Processing", color: "#eea43c", count: data.orders.filter((order) => ["Processing", "Pending"].includes(order.status)).length },
       { name: "Shipped", color: "#5499dc", count: data.orders.filter((order) => order.status === "Shipped").length },
       { name: "Cancelled", color: "#dd7478", count: data.orders.filter((order) => order.status === "Cancelled").length }
@@ -205,11 +232,15 @@
     const pending = data.orders.filter((order) => ["Pending", "Processing"].includes(order.status)).length;
     const lowStock = data.products.filter((product) => product.stock <= 6 && product.status === "Active").length;
     $("#pending-count").textContent = pending;
-    const actions = `<span class="date-chip">◷ &nbsp;Last 30 days &nbsp;⌄</span><button class="primary-button compact" data-action="add-product">＋ Add product</button>`;
+    const actions = `<button class="secondary-button" data-action="export-orders">↓ Export orders</button><button class="primary-button" data-action="add-product">＋ Add product</button>`;
     const recent = [...data.orders].sort((a, b) => b.date.localeCompare(a.date));
     const deliveredTotal = data.orders.filter((order) => order.status === "Delivered").length;
     const topProducts = [...data.products].sort((a, b) => b.sold - a.sold).slice(0, 4);
-    $("#page-content").innerHTML = `${heading("Good morning, Gabriella 👋", "Here’s what’s happening with your store today.", actions)}
+    $("#page-content").innerHTML = `${heading("Store overview", "A considered view of your business, all in one place.", actions)}
+      <section class="overview-welcome" aria-labelledby="welcome-title">
+        <div><span class="eyebrow">YOUR STORE, AT A GLANCE</span><h2 id="welcome-title">Good business starts<br>with a clear view.</h2><p>Keep the everyday running beautifully. Review orders, care for your catalog, and see what needs attention.</p><button type="button" class="welcome-link" data-view-link="orders">Manage your orders <span aria-hidden="true">↗</span></button></div>
+        <div class="welcome-tasks"><button type="button" data-view-link="orders"><span class="task-icon">${icons.bag}</span><span><strong>${pending} ${pending === 1 ? "order" : "orders"}</strong><small>Awaiting fulfilment</small></span><span aria-hidden="true">↗</span></button><button type="button" data-view-link="products"><span class="task-icon">${icons.products}</span><span><strong>${lowStock} products</strong><small>Need a stock check</small></span><span aria-hidden="true">↗</span></button><button type="button" data-view-link="customers"><span class="task-icon">${icons.customers}</span><span><strong>${data.customers.length} customers</strong><small>Get to know your community</small></span><span aria-hidden="true">↗</span></button></div>
+      </section>
       <div class="metric-grid">
         ${metricCard("Total revenue", money(revenue), "+12.8%", "vs. previous 30 days", "revenue")}
         ${metricCard("Total orders", String(data.orders.length), "+8.2%", "vs. previous 30 days", "bag", "green")}
@@ -217,9 +248,10 @@
         ${metricCard("Customers", String(data.customers.length), "+3.1%", "vs. previous 30 days", "customersMetric", "blue")}
       </div>
       <div class="chart-layout">
-        <section class="panel"><div class="panel-heading"><div><h2>Revenue over time</h2><p>Daily sales performance · Last 30 days</p></div><select class="select-control" aria-label="Revenue period" id="chart-period"><option>Last 30 days</option><option>Last 7 days</option><option>This year</option></select></div><div class="chart-wrap">${chartSVG()}</div></section>
+        <section class="panel"><div class="panel-heading"><div><h2>Revenue over time</h2><p>Illustrative sales trend · Sample data</p></div><span class="date-chip">Sample trend</span></div><div class="chart-wrap">${chartSVG()}</div></section>
         <section class="panel donut-panel"><div class="panel-heading"><div><h2>Orders by status</h2><p>A snapshot of your order fulfilment</p></div></div><div class="donut-area">${orderDonut()}<div class="legend">${[
           { name: "Delivered", color: "#20a779", count: deliveredTotal },
+          { name: "Paid", color: "#16233b", count: data.orders.filter(order => order.status === "Paid").length },
           { name: "Processing", color: "#eea43c", count: pending },
           { name: "Shipped", color: "#5499dc", count: data.orders.filter((order) => order.status === "Shipped").length },
           { name: "Cancelled", color: "#dd7478", count: data.orders.filter((order) => order.status === "Cancelled").length }
@@ -279,7 +311,8 @@
 
   function renderAnalytics() {
     const revenue = data.orders.filter((order) => order.status !== "Cancelled").reduce((sum, order) => sum + order.total, 0);
-    const avgOrder = data.orders.length ? revenue / data.orders.filter((order) => order.status !== "Cancelled").length : 0;
+    const validOrders = data.orders.filter(order => order.status !== "Cancelled").length;
+    const avgOrder = validOrders ? revenue / validOrders : 0;
     const top = [...data.products].sort((a, b) => b.sold - a.sold).slice(0, 6);
     $("#page-content").innerHTML = `${heading("Analytics", "Understand sales performance and product demand.", `<span class="date-chip">◷ &nbsp;Last 30 days &nbsp;⌄</span>`)}
       <div class="metric-grid">${metricCard("Gross sales", money(revenue), "+12.8%", "vs. previous period", "revenue")}${metricCard("Orders", String(data.orders.length), "+8.2%", "vs. previous period", "bag", "green")}${metricCard("Average order value", money(avgOrder), "+4.6%", "vs. previous period", "cart", "orange")}${metricCard("Conversion rate", "3.24%", "+0.6%", "vs. previous period", "analytics", "blue")}</div>
@@ -341,12 +374,15 @@
   }
 
   function handleClick(event) {
+    if (event.target.closest("#notifications-toggle")) { toggleNotifications(); return; }
+    if (!event.target.closest(".notification-wrap")) closeNotifications();
     const nav = event.target.closest("[data-view]");
     if (nav) { setView(nav.dataset.view); return; }
     const viewLink = event.target.closest("[data-view-link]");
     if (viewLink) { setView(viewLink.dataset.viewLink); return; }
     const action = event.target.closest("[data-action]")?.dataset.action;
     if (action === "logout") {
+      closeNotifications();
       sessionStorage.removeItem(SESSION_KEY);
       renderShell();
       return;
@@ -383,12 +419,15 @@
     }
     if (event.target.closest("[data-close-dialog]")) $("#product-dialog").close();
     if (event.target.closest("#mobile-menu")) {
-      $("#sidebar").classList.add("open");
-      $("#sidebar-scrim").classList.add("visible");
+      const open = $("#sidebar").classList.toggle("open");
+      $("#sidebar-scrim").classList.toggle("visible", open);
+      $("#mobile-menu").setAttribute("aria-expanded", String(open));
+      if (open) $(".nav-item.active").focus();
     }
     if (event.target.closest("#sidebar-scrim")) {
       $("#sidebar").classList.remove("open");
       $("#sidebar-scrim").classList.remove("visible");
+      $("#mobile-menu").setAttribute("aria-expanded", "false");
     }
   }
 
@@ -442,6 +481,16 @@
   }
 
   document.addEventListener("click", handleClick);
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+    if (!$("#notifications-panel").hidden) { closeNotifications(); $("#notifications-toggle").focus(); }
+    if ($("#sidebar").classList.contains("open")) {
+      $("#sidebar").classList.remove("open");
+      $("#sidebar-scrim").classList.remove("visible");
+      $("#mobile-menu").setAttribute("aria-expanded", "false");
+      $("#mobile-menu").focus();
+    }
+  });
   document.addEventListener("submit", handleSubmit);
   document.addEventListener("input", (event) => {
     if (event.target.id === "orders-search") {

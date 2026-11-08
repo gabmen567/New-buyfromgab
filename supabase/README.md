@@ -15,8 +15,10 @@ The setup imports the storefront's six categories, 21 subcategories and 36 catal
 
 ## Important
 
+The new content editor integration is documented in [`admin/STOREFRONT-EDITOR.md`](../admin/STOREFRONT-EDITOR.md). Apply [`storefront-content.sql`](./storefront-content.sql) after `setup.sql` and configure the public connection in `store-config.js` to enable authenticated content publishing and media uploads. The order/customer dashboard remains a demo; this integration publishes a separate storefront content document rather than synchronizing the relational commerce tables.
+
 - This SQL is prepared but has **not** been run against a Supabase project.
-- The current storefront and admin demo still use hard-coded/local-browser data. Applying the SQL does not connect either frontend to Supabase; that requires a separate integration change.
+- The current dashboard reporting screens use local sample data. The storefront content editor uses local drafts until configured; applying SQL alone does not configure the public connection or create an administrator account.
 - The admin dashboard's displayed demo login is not a Supabase user or secure authentication. Create real accounts through Supabase Auth and grant an admin role with the bootstrap statement.
 - The Supabase project URL alone is not sufficient to securely run SQL. Prefer the SQL Editor above, or use the Supabase CLI after authenticating locally. Never send or put a service-role key in the browser, source control, or chat.
 - Public checkout must call the `place_order` RPC; direct public inserts into orders and order items are denied. The RPC validates current catalog prices and inventory in a transaction.
