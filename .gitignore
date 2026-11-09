@@ -2,3 +2,7 @@
 .env*
 !.env.example
 supabase/.temp/
+dist/
+.deploy*/
+.image-browser*/
+.crop-browser*/
