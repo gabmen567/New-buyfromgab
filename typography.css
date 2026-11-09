@@ -1,0 +1,36 @@
+/* Ubuntu headings, self-hosted so no external font request is needed for titles. */
+@font-face {
+  font-family: "Ubuntu";
+  src: url("assets/fonts/Ubuntu-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ubuntu";
+  src: url("assets/fonts/Ubuntu-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Ubuntu";
+  src: url("assets/fonts/Ubuntu-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+:root {
+  --title-font: "Ubuntu", system-ui, sans-serif;
+  --display: var(--title-font);
+}
+h1, h2, h3, h4, h5, h6,
+.hero-title, .page-title, .tile-title, .banner-text h1, .mb-text strong,
+.related-title, .sec-title, .mg-head h2, .co-card legend, .drawer h2,
+.site-header .brand, .footer-logo, .f-connect h2, .f-brand h2, .f-brand h3, .f-title,
+.page-heading h1, .login-message h1, .login-form h2, .login-panel h2, .dialog-heading h2,
+.overview-welcome h2, .panel-heading h2, .panel-title, .settings-form h2, .demo-card h3,
+.notifications-panel h2, .editor-gate h1, .editor-heading h1, .editor-panel h2,
+.editor-section-head h2, .banner-preview strong, .crop-heading h2 {
+  font-family: var(--title-font);
+}
