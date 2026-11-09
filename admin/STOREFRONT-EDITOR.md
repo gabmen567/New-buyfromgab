@@ -54,7 +54,9 @@ Public reads can see only the published content document. The draft requires adm
 This editor publishes the customer-facing catalog and presentation as a content document. The original admin dashboard's order/customer/analytics screens and **Demo inventory** remain sample reporting tools. They are not a live order-management backend. Storefront checkout continues to use the existing WhatsApp flow. Content stock is a displayed availability value, not a transactional reservation system. The relational `products` and order tables prepared in `setup.sql` are not synchronized with content-document products; use this editor as the source for the current WhatsApp storefront until a full commerce integration is implemented.
 
 Supabase requires a live project, applied schema, public configuration, and a real administrator account. A public URL/key cannot run SQL or create administrator privileges. Remote authentication, database policy enforcement and uploads must be verified against that project after configuration.
-# Grouped font sizes
+# Grouped fonts and sizes
+
+In **Fonts & sizes**, each text group also has a font family, weight (Automatic, Regular, Bold), and style (Automatic, Normal, Italic). These apply across devices. Font choices include Ubuntu, system sans-serif, Arial, Georgia, Times New Roman, Verdana, and Trebuchet MS. System fonts use the listed fallback when unavailable on a visitor's device. Resetting a group restores its original font, weight, style, and responsive sizes.
 
 Open **Font sizes** in the storefront editor. Each group has independent desktop (1100 px and wider) and mobile/tablet sizes. Use the number input arrows or type a whole number from 10 to 72 px. Blank means the original responsive sizing. Reset a group or all groups to restore automatic sizing. Save a draft, Preview, then Publish store to apply the settings for visitors. These settings change website text; text baked into an uploaded image must be changed in the original design.
 

@@ -73,7 +73,7 @@
       if (button.dataset.section === section) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
     });
     let html = "";
-    if (section === "typography") html = sectionHead("Font sizes, grouped your way", "Adjust each group separately for desktop and mobile. Leave a size blank to keep the original responsive design.", '<button type="button" class="secondary-button" data-reset-fonts>Reset all sizes</button>') + '<div class="editor-panel"><p>Sizes are in pixels (10–72). Save a draft and use Preview to review the actual storefront before publishing. Text inside uploaded designs is part of the image and is edited in your design file.</p></div>' + Object.entries(cms.typographyGroups).map(([key, group]) => `<div class="editor-panel"><h2>${esc(group.label)}</h2><div class="editor-grid">${field("Desktop size (px)", `typography.${key}.desktop`, "number", `min="10" max="72" step="1" placeholder="Auto (example ${group.desktop})"`)}${field("Mobile size (px)", `typography.${key}.mobile`, "number", `min="10" max="72" step="1" placeholder="Auto (example ${group.mobile})"`)}</div><p class="font-size-sample" data-font-sample="${key}">Your ${esc(group.label.toLowerCase())}</p><button type="button" class="small-action" data-reset-font="${key}">Reset this group</button></div>`).join("");
+    if (section === "typography") html = sectionHead("Text styles, grouped your way", "Choose fonts, bold and italic for each group. Adjust desktop and mobile sizes separately.", '<button type="button" class="secondary-button" data-reset-fonts>Reset all styles</button>') + '<div class="editor-panel"><p>Sizes are in pixels (10–72). Save a draft and use Preview to review the actual storefront before publishing. Text inside uploaded designs is part of the image and is edited in your design file.</p></div>' + Object.entries(cms.typographyGroups).map(([key, group]) => `<div class="editor-panel"><h2>${esc(group.label)}</h2>${fontStyleControls(key)}<div class="editor-grid">${field("Desktop size (px)", `typography.${key}.desktop`, "number", `min="10" max="72" step="1" placeholder="Auto (example ${group.desktop})"`)}${field("Mobile size (px)", `typography.${key}.mobile`, "number", `min="10" max="72" step="1" placeholder="Auto (example ${group.mobile})"`)}</div><p class="font-size-sample" data-font-sample="${key}">Your ${esc(group.label.toLowerCase())}</p><button type="button" class="small-action" data-reset-font="${key}">Reset this group</button></div>`).join("");
     if (section === "homepage") html = sectionHead("The first impression", "Shape the words that welcome customers into your store.") + `<div class="editor-panel">${field("Main heading", "homepage.title")}${field("Introduction", "homepage.subtitle", "textarea")}${field("Small heading above the title", "homepage.kicker")}</div>${promisesEditor()}<div class="editor-panel"><h2>Footer & updates</h2>${field("Updates heading", "homepage.newsletterTitle")}${field("Updates description", "homepage.newsletterText", "textarea")}${field("About the store", "homepage.footerText", "textarea")}</div><div class="editor-panel"><h2>Social media links</h2><p>Icons appear beside WhatsApp in the footer. Add your profile links to make them clickable; leave a link blank to show its icon without a link.</p>${field("Facebook profile URL", "homepage.socials.facebook", "url")}${field("Instagram profile URL", "homepage.socials.instagram", "url")}${field("X (Twitter) profile URL", "homepage.socials.twitter", "url")}${field("YouTube channel URL", "homepage.socials.youtube", "url")}</div>`;
     if (section === "categories") html = sectionHead("A colourful collection", "Edit category names, artwork, colours and their order. Hidden categories and their products disappear from the storefront.") + doc.categories.map((c, i) => `<div class="editor-panel"><span class="editor-number">Category ${i + 1} · ${esc(c.id)}</span><div class="editor-grid"><div>${field("Category name", `categories.${i}.name`)}${field("Background colour", `categories.${i}.color`, "color")}${field("Button label (optional)", `categories.${i}.cta`)}${check("Visible in store", `categories.${i}.visible`)}${check("Wide homepage tile", `categories.${i}.wide`)}</div><div>${fullDesignControls(`categories.${i}`, "category")}${!c.fullImageMode ? imageField("Category artwork", `categories.${i}.image`, "600 × 600 px, transparent background") : ""}</div></div>${reorder("categories", i, doc.categories.length)}</div>`).join("");
     if (section === "banners") {
@@ -93,11 +93,18 @@
     updateFontSamples();
     updatePromisePreviews();
   }
+  function fontStyleControls(key) {
+    const path = `typography.${key}`;
+    return `<div class="editor-grid">${select("Font family", path + ".family", [["", "Automatic (original font)"], ...Object.entries(cms.typographyFonts).map(([id, font]) => [id, font.label])])}${select("Weight", path + ".weight", [["", "Automatic"], ["normal", "Regular"], ["bold", "Bold"]])}${select("Style", path + ".style", [["", "Automatic"], ["normal", "Normal"], ["italic", "Italic"]])}</div><p class="image-dimensions">Font, weight and style apply on both desktop and mobile.</p>`;
+  }
   function updateFontSamples() {
     document.querySelectorAll("[data-font-sample]").forEach(sample => {
       const sizes = doc.typography[sample.dataset.fontSample];
       const value = sizes.desktop ?? sizes.mobile ?? 24;
       sample.style.fontSize = `${Math.max(10, Math.min(72, Number(value) || 24))}px`;
+      sample.style.fontFamily = cms.typographyFonts[sizes.family]?.css || "";
+      sample.style.fontWeight = sizes.weight === "bold" ? "700" : sizes.weight === "normal" ? "400" : "";
+      sample.style.fontStyle = sizes.style || "";
     });
   }
   function productList() {
@@ -146,7 +153,7 @@
     if (input.id === "catalog-search") { query = input.value; $("#catalog-list").innerHTML = productList(); return; }
     if (!input.dataset.bind) return;
     if (input.dataset.bind.startsWith("typography.")) {
-      set(input.dataset.bind, input.value === "" ? null : Number(input.value));
+      set(input.dataset.bind, input.type === "number" ? (input.value === "" ? null : Number(input.value)) : input.value);
       updateFontSamples(); return;
     }
     set(input.dataset.bind, input.type === "checkbox" ? input.checked : input.type === "number" ? (input.dataset.bind.endsWith(".stock") && input.value === "" ? null : Number(input.value)) : input.value);

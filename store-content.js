@@ -6,6 +6,15 @@
   const base = String(config.supabaseUrl || "").replace(/\/$/, "");
   const key = "buyfromgab-content-v1-", sessionKey = key + "session";
   const clone = value => JSON.parse(JSON.stringify(value));
+  const typographyFonts = {
+    ubuntu: { label: "Ubuntu", css: '"Ubuntu",system-ui,sans-serif' },
+    system: { label: "System sans-serif", css: 'system-ui,sans-serif' },
+    arial: { label: "Arial", css: 'Arial,Helvetica,sans-serif' },
+    georgia: { label: "Georgia", css: 'Georgia,"Times New Roman",serif' },
+    times: { label: "Times New Roman", css: '"Times New Roman",Times,serif' },
+    verdana: { label: "Verdana", css: 'Verdana,Geneva,sans-serif' },
+    trebuchet: { label: "Trebuchet MS", css: '"Trebuchet MS",Arial,sans-serif' }
+  };
   const typographyGroups = {
     categories: { label: "Storefront category names", selector: ".tile .tile-title", desktop: 27, mobile: 18 },
     navigation: { label: "Category navigation", selector: ".pill,.chip,.side-cat", desktop: 14, mobile: 13 },
@@ -25,17 +34,27 @@
     for (const [key, sizes] of Object.entries(settings)) {
       if (!Object.hasOwn(typographyGroups, key) || !sizes || typeof sizes !== "object" || Array.isArray(sizes)) throw new Error("Unknown font size group.");
       for (const [device, value] of Object.entries(sizes)) {
+        if (device === "family" && (value === "" || Object.hasOwn(typographyFonts, value))) continue;
+        if (device === "weight" && ["", "normal", "bold"].includes(value)) continue;
+        if (device === "style" && ["", "normal", "italic"].includes(value)) continue;
         if (!["desktop", "mobile"].includes(device) || (value !== null && (!Number.isInteger(value) || value < 10 || value > 72))) throw new Error("Font sizes must be whole numbers between 10 and 72 px, or blank for automatic sizing.");
       }
     }
   }
   function typographyCSS(settings) {
     validateTypography(settings);
+    const shared = Object.entries(typographyGroups).map(([key, group]) => {
+      const options = settings?.[key] || {}, declarations = [];
+      if (options.family) declarations.push(`font-family:${typographyFonts[options.family].css}!important`);
+      if (options.weight) declarations.push(`font-weight:${options.weight === "bold" ? 700 : 400}!important`);
+      if (options.style) declarations.push(`font-style:${options.style}!important`);
+      return declarations.length ? `${group.selector}{${declarations.join(";")};}` : "";
+    }).join("\n");
     const rules = device => Object.entries(typographyGroups).map(([key, group]) => {
       const value = settings?.[key]?.[device];
       return value == null ? "" : `${group.selector}{font-size:${value}px!important;line-height:1.25;overflow-wrap:anywhere;}`;
     }).join("\n");
-    return `@media(max-width:1099px){${rules("mobile")}}\n@media(min-width:1100px){${rules("desktop")}}`;
+    return `${shared}\n@media(max-width:1099px){${rules("mobile")}}\n@media(min-width:1100px){${rules("desktop")}}`;
   }
   function applyTypography(settings) {
     let style = document.getElementById("store-font-sizes");
@@ -197,7 +216,7 @@
     return base + "/storage/v1/object/public/storefront-media/" + path;
   }
   const initialContent = defaults();
-  window.StoreContent = { typographyGroups, typographyCSS, applyTypography, remote, defaults: () => clone(initialContent), defaultPromises, promiseIcons, promiseIcon, validate, image, link, clone, read, write, upload, signIn, getSession, signOut: async () => {
+  window.StoreContent = { typographyFonts, typographyGroups, typographyCSS, applyTypography, remote, defaults: () => clone(initialContent), defaultPromises, promiseIcons, promiseIcon, validate, image, link, clone, read, write, upload, signIn, getSession, signOut: async () => {
     try { if (remote && getSession()) await request("/auth/v1/logout", { auth: true, method: "POST" }); }
     finally { sessionStorage.removeItem(sessionKey); }
   }, storageKey: key };
