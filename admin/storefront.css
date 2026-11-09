@@ -72,6 +72,23 @@
 .catalog-filter { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
 .danger-button { color: #a32639; }
 .editor-empty { padding: 40px; text-align: center; background: #ffffff; border: 1px dashed var(--line); border-radius: 22px; color: #5e677b; }
+.promise-editors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin-top: 24px; }
+.promise-editor { min-width: 0; padding: 22px; border: 1px solid var(--line); border-radius: 18px; }
+.promise-preview { display: flex; align-items: center; gap: 14px; padding: 18px; margin-bottom: 22px; border-radius: 14px; background: #eef0f7; }
+.promise-preview > svg { width: 28px; height: 28px; flex: none; color: #246637; }
+.promise-preview strong, .promise-preview small { display: block; overflow-wrap: anywhere; }
+.promise-preview strong { font-size: 14px; }
+.promise-preview small { font-size: 12px; color: #5e677b; margin-top: 4px; }
+.promise-preview.is-hidden { opacity: .45; }
+.promise-icon-picker { min-width: 0; border: 0; margin: 20px 0; padding: 0; }
+.promise-icon-picker legend { padding: 0; margin-bottom: 12px; font-size: 12px; font-weight: 600; }
+.promise-icon-picker > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.promise-icon-picker button { display: grid; justify-items: center; align-content: center; gap: 8px; min-height: 78px; padding: 10px 5px; border: 1px solid var(--line); border-radius: 12px; background: #ffffff; color: #5e677b; }
+.promise-icon-picker button[aria-pressed="true"] { border-color: #246637; background: #d4f5db; color: #16233b; box-shadow: inset 0 0 0 1px #246637; }
+.promise-icon-picker svg { width: 24px; height: 24px; }
+.promise-icon-picker span { font-size: 10px; line-height: 1.3; text-align: center; }
+@media (max-width: 1100px) { .promise-editors { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .promise-editor { padding: 16px; } .promise-icon-picker > div { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .image-crop-dialog { width: min(900px, calc(100vw - 24px)); max-height: calc(100svh - 24px); overflow: auto; padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: #ffffff; color: #16233b; box-shadow: 0 24px 90px #16233b40; }
 .image-crop-dialog::backdrop { background: #0e172cbb; backdrop-filter: blur(5px); }
 .crop-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; }

@@ -47,12 +47,30 @@
     if (banner.fullImageMode && banner.fullImage) return `<div class="banner-preview complete-design-preview"><img src="${esc(cms.image(banner.fullImage))}" alt="Complete design preview"></div>`;
     return `<div class="banner-preview" data-preview="${path}" style="background-color:${esc(banner.color)}">${banner.left ? `<img src="${esc(cms.image(banner.left))}" alt="">` : ""}<div><strong>${esc(banner.title)}</strong><p>${esc(banner.subtitle || "")}</p></div>${banner.right || banner.image ? `<img src="${esc(cms.image(banner.right || banner.image))}" alt="">` : ""}</div>`;
   }
+  function promisesEditor() {
+    return `<div class="editor-panel"><h2>Your store promises</h2><p>Edit the delivery, returns, support and payment messages shown below the category collection.</p>${check("Show the store promises section", "homepage.showBenefits")}<div class="promise-editors">${doc.homepage.promises.map((promise, i) => {
+      const path = `homepage.promises.${i}`;
+      return `<section class="promise-editor" aria-label="Promise ${i + 1}"><span class="editor-number">Promise ${i + 1}</span><div class="promise-preview" data-promise-preview="${i}">${cms.promiseIcon(promise.icon)}<span><strong>${esc(promise.title)}</strong><small>${esc(promise.text)}</small></span></div>${field("Title", path + ".title", "text", 'maxlength="80"')}${field("Supporting text", path + ".text", "text", 'maxlength="160"')}<fieldset class="promise-icon-picker"><legend>Choose an icon</legend><div>${Object.entries(cms.promiseIcons).map(([key, icon]) => `<button type="button" data-promise-icon="${i}:${key}" aria-pressed="${promise.icon === key}">${cms.promiseIcon(key)}<span>${esc(icon.label)}</span></button>`).join("")}</div></fieldset>${check("Show this promise", path + ".visible")}</section>`;
+    }).join("")}</div></div>`;
+  }
+  function updatePromisePreviews() {
+    document.querySelectorAll("[data-promise-preview]").forEach(preview => {
+      const promise = doc.homepage.promises[Number(preview.dataset.promisePreview)];
+      preview.innerHTML = `${cms.promiseIcon(promise.icon)}<span><strong>${esc(promise.title)}</strong><small>${esc(promise.text)}</small></span>`;
+      preview.classList.toggle("is-hidden", !promise.visible);
+    });
+    document.querySelectorAll("[data-promise-icon]").forEach(button => {
+      const [i, icon] = button.dataset.promiseIcon.split(":");
+      button.setAttribute("aria-pressed", String(doc.homepage.promises[Number(i)].icon === icon));
+    });
+  }
   function render() {
+    if (doc.homepage.promises === undefined) doc.homepage.promises = cms.defaultPromises();
     document.querySelectorAll("[data-section]").forEach(button => {
       if (button.dataset.section === section) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
     });
     let html = "";
-    if (section === "homepage") html = sectionHead("The first impression", "Shape the words that welcome customers into your store.") + `<div class="editor-panel">${field("Main heading", "homepage.title")}${field("Introduction", "homepage.subtitle", "textarea")}${field("Small heading above the title", "homepage.kicker")}${check("Show delivery, returns, support and payment promises", "homepage.showBenefits")}</div><div class="editor-panel"><h2>Footer & updates</h2>${field("Updates heading", "homepage.newsletterTitle")}${field("Updates description", "homepage.newsletterText", "textarea")}${field("About the store", "homepage.footerText", "textarea")}</div>`;
+    if (section === "homepage") html = sectionHead("The first impression", "Shape the words that welcome customers into your store.") + `<div class="editor-panel">${field("Main heading", "homepage.title")}${field("Introduction", "homepage.subtitle", "textarea")}${field("Small heading above the title", "homepage.kicker")}</div>${promisesEditor()}<div class="editor-panel"><h2>Footer & updates</h2>${field("Updates heading", "homepage.newsletterTitle")}${field("Updates description", "homepage.newsletterText", "textarea")}${field("About the store", "homepage.footerText", "textarea")}</div>`;
     if (section === "categories") html = sectionHead("A colourful collection", "Edit category names, artwork, colours and their order. Hidden categories and their products disappear from the storefront.") + doc.categories.map((c, i) => `<div class="editor-panel"><span class="editor-number">Category ${i + 1} · ${esc(c.id)}</span><div class="editor-grid"><div>${field("Category name", `categories.${i}.name`)}${field("Background colour", `categories.${i}.color`, "color")}${field("Button label (optional)", `categories.${i}.cta`)}${check("Visible in store", `categories.${i}.visible`)}${check("Wide homepage tile", `categories.${i}.wide`)}</div><div>${fullDesignControls(`categories.${i}`, "category")}${!c.fullImageMode ? imageField("Category artwork", `categories.${i}.image`, "600 × 600 px, transparent background") : ""}</div></div>${reorder("categories", i, doc.categories.length)}</div>`).join("");
     if (section === "banners") {
       const i = Math.min(bannerIndex, doc.banners.length - 1), path = `banners.${i}`;
@@ -68,6 +86,7 @@
       html = sectionHead("Your storefront catalog", "These are the products customers see after you publish. Check prices and stock before publishing.", '<button class="primary-button" type="button" data-add-product>＋ Add product</button>') + `<div class="catalog-editor"><div><input class="catalog-filter" id="catalog-search" type="search" placeholder="Find a product…" aria-label="Search catalog" value="${esc(query)}"><div class="catalog-list" id="catalog-list">${productList()}</div></div>${p ? `<div class="editor-panel"><span class="editor-number">Product ${p.id}</span>${field("Product name", path + ".name")}${field("Description", path + ".desc", "textarea")}${field("Brand", path + ".brand")}<div class="editor-grid">${select("Category", path + ".cat", doc.categories.map(c => [c.id, c.name]))}${select("Subcategory", path + ".sub", (window.StoreCatalog.SUBCATS[p.cat] || []).map(s => [s.id, s.name]))}</div><div class="editor-grid">${field("Selling price (GHS)", path + ".price", "number", 'min="0" step="0.01"')}${field("Original price (0 for no discount)", path + ".oldPrice", "number", 'min="0" step="0.01"')}${field("Stock available (blank = not tracked)", path + ".stock", "number", 'min="0" step="1"')}${field("Fallback emoji", path + ".emoji")}</div>${imageField("Product photo", path + ".img", "1200 × 1200 px (1:1)")}${check("Visible in store", path + ".visible")}${check("New arrival", path + ".isNew")}${check("Best seller", path + ".best")}${check("Flash sale (set an original price too)", path + ".flash")}<div class="editor-row-actions"><button class="secondary-button danger-button" type="button" data-delete-product="${i}">Delete product</button></div></div>` : '<div class="editor-empty">Your catalog is empty. Add a product to start.</div>'}</div>`;
     }
     $("#content-fields").innerHTML = html;
+    updatePromisePreviews();
   }
   function productList() {
     const matches = doc.products.map((p, i) => ({ p, i })).filter(({ p }) => `${p.name} ${p.brand} ${p.id}`.toLowerCase().includes(query.toLowerCase()));
@@ -115,6 +134,7 @@
     if (input.id === "catalog-search") { query = input.value; $("#catalog-list").innerHTML = productList(); return; }
     if (!input.dataset.bind) return;
     set(input.dataset.bind, input.type === "checkbox" ? input.checked : input.type === "number" ? (input.dataset.bind.endsWith(".stock") && input.value === "" ? null : Number(input.value)) : input.value);
+    if (input.dataset.bind.startsWith("homepage.promises.")) updatePromisePreviews();
     if (input.dataset.bind.endsWith(".fullImageMode") || input.dataset.bind.endsWith(".wide")) { render(); return; }
     if (input.dataset.bind.endsWith(".cat")) {
       const p = doc.products[productIndex]; p.sub = window.StoreCatalog.SUBCATS[p.cat]?.[0]?.id || ""; render();
@@ -153,6 +173,11 @@
   document.addEventListener("click", event => {
     if (busy || !doc) return;
     const target = event.target.closest("button"); if (!target) return;
+    if (target.dataset.promiseIcon) {
+      const [i, icon] = target.dataset.promiseIcon.split(":");
+      if (Object.hasOwn(cms.promiseIcons, icon)) { set(`homepage.promises.${Number(i)}.icon`, icon); updatePromisePreviews(); }
+      return;
+    }
     if (target.dataset.section) { section = target.dataset.section; history.replaceState(null, "", "#" + section); render(); return; }
     if (target.dataset.productIndex !== undefined) { productIndex = Number(target.dataset.productIndex); render(); return; }
     if (target.dataset.clearImage) { set(target.dataset.clearImage, ""); render(); return; }

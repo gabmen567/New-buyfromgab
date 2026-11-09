@@ -1525,7 +1525,9 @@ function applyStorefrontDocument(content) {
   $("#hero-title").textContent = home.title;
   $(".hero-sub").textContent = home.subtitle || "";
   $("#hero").dataset.kicker = home.kicker || "";
-  $(".benefits").hidden = home.showBenefits === false;
+  const promises = home.promises || window.StoreContent.defaultPromises();
+  $(".benefits").hidden = home.showBenefits === false || !promises.some(p => p.visible);
+  $(".benefits").innerHTML = promises.filter(p => p.visible).map(p => `<li>${window.StoreContent.promiseIcon(p.icon)}<span><strong>${esc(p.title)}</strong><small>${esc(p.text)}</small></span></li>`).join("");
   $(".f-brand > p").textContent = home.footerText || "";
   $(".f-connect h2").textContent = home.newsletterTitle || "";
   $(".f-connect > p").textContent = home.newsletterText || "";

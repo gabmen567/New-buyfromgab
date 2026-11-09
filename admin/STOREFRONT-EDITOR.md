@@ -4,7 +4,7 @@ Open `/admin/storefront.html`, or choose **Edit storefront** in the admin sideba
 
 ## Everyday editing
 
-1. Open **Homepage** to edit the main heading, introduction, small heading, footer copy and updates text. Toggle the delivery/returns/support promises here.
+1. Open **Homepage** to edit the main heading, introduction, small heading, footer copy and updates text. In **Your store promises**, edit each card’s title and supporting text, choose an icon visually (delivery truck, returns, support headset, payment card, security shield, package, clock or star), and toggle individual cards or the whole section. The preview updates as you edit. Existing saved content gains the original four promises automatically; no SQL migration is needed. Save a draft and preview, then publish to update the storefront.
 2. Open **Categories** to edit the ten category names, colours, tile artwork, button labels, wide tiles, order and visibility. Hiding a category also hides its products from the storefront.
 3. Open **Category banners** and choose a page, including **All products**. Edit its text, background, left/right images and visibility. The right image is used on mobile.
 4. Open **Promotional banners** to create homepage banners with a headline, supporting copy, uploaded image, button and destination. Shop destinations use `#/all`, `#/c/food`, `#/p/1`, etc. Full HTTPS links also work. Banners can be reordered or hidden.

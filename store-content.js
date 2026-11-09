@@ -9,6 +9,27 @@
   const catalog = window.StoreCatalog;
   const categoryDefinitions = clone(catalog.CATEGORIES);
   const colours = { food: "#62dfb3", home: "#ffb46b", bath: "#f5d665", pharm: "#c8a5f5", tech: "#9cde65", cloth: "#f69fbb", beauty: "#7ed8da", toys: "#ffa28d", building: "#93bdf5", auto: "#b8ce78" };
+  const promiseIcons = {
+    truck: { label: "Delivery truck", paths: '<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>' },
+    returns: { label: "Returns arrow", paths: '<path d="m8 4-5 5 5 5M3 9h11a6 6 0 0 1 0 12h-2"/>' },
+    headset: { label: "Support headset", paths: '<path d="M4 13v-1a8 8 0 0 1 16 0v1M4 12h3v7H4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1ZM20 12h-3v7h3a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1ZM19 19a3 3 0 0 1-3 3h-4"/>' },
+    card: { label: "Payment card", paths: '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/>' },
+    shield: { label: "Security shield", paths: '<path d="m12 2 8 3v6c0 5-8 11-8 11S4 16 4 11V5zM8 11l3 3 5-6"/>' },
+    package: { label: "Package", paths: '<path d="m12 2 9 5v10l-9 5-9-5V7zM3 7l9 5 9-5M12 12v10M8 4l9 5"/>' },
+    clock: { label: "Clock", paths: '<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>' },
+    star: { label: "Quality star", paths: '<path d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1z"/>' }
+  };
+  function promiseIcon(key) {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(promiseIcons[key] || promiseIcons.truck).paths}</svg>`;
+  }
+  function defaultPromises() {
+    return [
+      { icon: "truck", title: "Free Delivery", text: "For orders over GH₵500", visible: true },
+      { icon: "returns", title: "7 Day Return", text: "7-Day Return Policy", visible: true },
+      { icon: "headset", title: "Online Support", text: "24/7 Customer Support", visible: true },
+      { icon: "card", title: "Secured Payment", text: "Secured", visible: true }
+    ];
+  }
   function image(value) {
     const url = String(value || "").trim();
     if (!url) return "";
@@ -23,7 +44,7 @@
   function defaults() {
     return {
       schema: 1,
-      homepage: { title: "What’s on your list?", subtitle: "All Categories · Everything you need, in one place.", kicker: "THE EVERYDAY COLLECTION", newsletterTitle: "A little more from GAB.", newsletterText: "Leave your email, then send your request on WhatsApp for offers and updates.", footerText: "Everything you need, in one place. Shop food, home essentials, electronics, fashion and more, and order easily on WhatsApp.", showBenefits: true },
+      homepage: { title: "What’s on your list?", subtitle: "All Categories · Everything you need, in one place.", kicker: "THE EVERYDAY COLLECTION", newsletterTitle: "A little more from GAB.", newsletterText: "Leave your email, then send your request on WhatsApp for offers and updates.", footerText: "Everything you need, in one place. Shop food, home essentials, electronics, fashion and more, and order easily on WhatsApp.", showBenefits: true, promises: defaultPromises() },
       categories: catalog.CATEGORIES.map(c => ({ id: c.id, name: c.name, color: colours[c.id], image: catalog.ART[c.id], visible: true, wide: Boolean(c.wide), cta: c.cta || "" })),
       products: catalog.PRODUCTS.map(p => ({ ...clone(p), stock: p.stock ?? null, visible: true })),
       banners: ["all", ...catalog.CATEGORIES.map(c => c.id)].map(id => {
@@ -36,6 +57,12 @@
   function validate(doc) {
     if (!doc || doc.schema !== 1 || !doc.homepage || !Array.isArray(doc.categories) || !Array.isArray(doc.products) || !Array.isArray(doc.banners) || !Array.isArray(doc.promotions)) throw new Error("This content file has an unsupported format.");
     if (!String(doc.homepage.title || "").trim()) throw new Error("Enter a homepage title.");
+    if (doc.homepage.promises !== undefined) {
+      if (!Array.isArray(doc.homepage.promises) || doc.homepage.promises.length > 8) throw new Error("Use up to eight store promises.");
+      for (const promise of doc.homepage.promises) {
+        if (!Object.hasOwn(promiseIcons, promise.icon) || typeof promise.title !== "string" || !promise.title.trim() || promise.title.length > 80 || typeof promise.text !== "string" || promise.text.length > 160 || typeof promise.visible !== "boolean") throw new Error("Each promise needs an icon, a title (up to 80 characters), supporting text (up to 160 characters), and a visibility setting.");
+      }
+    }
     const ids = new Set();
     for (const c of doc.categories) {
       if (!categoryDefinitions.some(original => original.id === c.id) || ids.has(c.id) || typeof c.name !== "string" || !c.name.trim() || !/^#[0-9a-f]{6}$/i.test(c.color)) throw new Error("Check the category names, identifiers and colours.");
@@ -125,7 +152,7 @@
     return base + "/storage/v1/object/public/storefront-media/" + path;
   }
   const initialContent = defaults();
-  window.StoreContent = { remote, defaults: () => clone(initialContent), validate, image, link, clone, read, write, upload, signIn, getSession, signOut: async () => {
+  window.StoreContent = { remote, defaults: () => clone(initialContent), defaultPromises, promiseIcons, promiseIcon, validate, image, link, clone, read, write, upload, signIn, getSession, signOut: async () => {
     try { if (remote && getSession()) await request("/auth/v1/logout", { auth: true, method: "POST" }); }
     finally { sessionStorage.removeItem(sessionKey); }
   }, storageKey: key };
