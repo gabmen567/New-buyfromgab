@@ -151,6 +151,10 @@ a { text-underline-offset: 4px; }
 .f-brand h2, .f-brand h3, .f-title { font-family: var(--display); font-weight: 400; }
 .f-links a { display: inline-block; padding-block: 4px; }
 .f-form input, .f-form button { border-radius: var(--radius-control); }
+.f-social { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.f-social a, .f-social .social-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border: 1px solid var(--line); border-radius: 50%; background: var(--bg); color: var(--ink); }
+.f-social svg { width: 20px; height: 20px; }
+.f-social a:hover { background: var(--brand-green); border-color: var(--brand-green); color: var(--brand-navy); }
 .f-connect h2 { font: 400 28px/1.2 var(--display); }
 .footer-shortcuts { display: flex; flex-wrap: wrap; gap: 12px 26px; padding-block: 24px; margin-top: 24px; border-top: 1px solid var(--line); font-size: 13px; }
 .footer-shortcuts a { padding-block: 6px; text-decoration: none; }

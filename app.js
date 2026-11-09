@@ -608,18 +608,24 @@ window.addEventListener("hashchange", () => { routeOverride = null; route(); });
 /* Footer, track order link, account page and policy pages */
 
 /* ====== Footer: social links, newsletter, privacy and terms ====== */
-/* Paste your social page links here. Only the ones you fill in will show; WhatsApp always shows. */
+/* Profile URLs are editable in Homepage → Social media links. */
 const SOCIAL = { facebook: "", instagram: "", twitter: "", youtube: "" };
 const SOCIAL_ICONS = {
   facebook: `<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>`,
   instagram: `<rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/>`,
-  twitter: `<path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>`,
+  twitter: `<path d="M4 3h4l12 18h-4zM20 3 4 21"/>`,
   youtube: `<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/>`,
   whatsapp: `<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>`
 };
 function renderFooterSocial() {
-  const links = Object.entries(SOCIAL).filter(([, url]) => /^https?:\/\//.test(url)).concat([["whatsapp", "https://wa.me/" + WHATSAPP_NUMBER]]);
-  $("#f-social").innerHTML = links.map(([k, url]) => `<a href="${esc(url)}" target="_blank" rel="noopener" aria-label="${k === "whatsapp" ? "WhatsApp" : k[0].toUpperCase() + k.slice(1)}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SOCIAL_ICONS[k]}</svg></a>`).join("");
+  const profiles = storefrontContent?.homepage.socials || SOCIAL;
+  const links = [["whatsapp", "https://wa.me/" + WHATSAPP_NUMBER], ...Object.keys(SOCIAL).map(key => [key, profiles[key] || ""])];
+  $("#f-social").innerHTML = links.map(([key, value]) => {
+    const label = key === "whatsapp" ? "WhatsApp" : key === "twitter" ? "X (Twitter)" : key[0].toUpperCase() + key.slice(1);
+    const icon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SOCIAL_ICONS[key]}</svg>`;
+    const url = /^https:\/\//i.test(value) ? window.StoreContent.link(value) : "";
+    return url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="${label}" title="${label}">${icon}</a>` : `<span class="social-icon" role="img" aria-label="${label}" title="${label}">${icon}</span>`;
+  }).join("");
 }
 const LEGAL = {
   privacy: { title: "Privacy Policy", items: [
@@ -1531,6 +1537,7 @@ function applyStorefrontDocument(content) {
   $(".f-brand > p").textContent = home.footerText || "";
   $(".f-connect h2").textContent = home.newsletterTitle || "";
   $(".f-connect > p").textContent = home.newsletterText || "";
+  renderFooterSocial();
   let promotions = $("#store-promotions");
   if (!promotions) { promotions = document.createElement("div"); promotions.id = "store-promotions"; promotions.className = "store-promotions"; $(".hero-sub").after(promotions); }
   promotions.innerHTML = content.promotions.filter(b => b.visible !== false).map(b => b.fullImageMode && b.fullImage ? `<a class="store-promotion full-image" href="${esc(window.StoreContent.link(b.link) || "#/all")}" aria-label="${esc(b.title || "Shop collection")}">${fullDesignHTML(b)}</a>` : `<a class="store-promotion" href="${esc(window.StoreContent.link(b.link) || "#/all")}" style="background-color:${esc(b.color)}"><div><h2>${esc(b.title)}</h2><p>${esc(b.subtitle || "")}</p><span>${esc(b.cta || "Shop now")} →</span></div>${b.image ? `<img src="${esc(window.StoreContent.image(b.image))}" alt="">` : ""}</a>`).join("");

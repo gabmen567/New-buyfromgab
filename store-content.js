@@ -44,7 +44,7 @@
   function defaults() {
     return {
       schema: 1,
-      homepage: { title: "What’s on your list?", subtitle: "All Categories · Everything you need, in one place.", kicker: "THE EVERYDAY COLLECTION", newsletterTitle: "A little more from GAB.", newsletterText: "Leave your email, then send your request on WhatsApp for offers and updates.", footerText: "Everything you need, in one place. Shop food, home essentials, electronics, fashion and more, and order easily on WhatsApp.", showBenefits: true, promises: defaultPromises() },
+      homepage: { title: "What’s on your list?", subtitle: "All Categories · Everything you need, in one place.", kicker: "THE EVERYDAY COLLECTION", newsletterTitle: "A little more from GAB.", newsletterText: "Leave your email, then send your request on WhatsApp for offers and updates.", footerText: "Everything you need, in one place. Shop food, home essentials, electronics, fashion and more, and order easily on WhatsApp.", socials: { facebook: "", instagram: "", twitter: "", youtube: "" }, showBenefits: true, promises: defaultPromises() },
       categories: catalog.CATEGORIES.map(c => ({ id: c.id, name: c.name, color: colours[c.id], image: catalog.ART[c.id], visible: true, wide: Boolean(c.wide), cta: c.cta || "" })),
       products: catalog.PRODUCTS.map(p => ({ ...clone(p), stock: p.stock ?? null, visible: true })),
       banners: ["all", ...catalog.CATEGORIES.map(c => c.id)].map(id => {
@@ -57,6 +57,14 @@
   function validate(doc) {
     if (!doc || doc.schema !== 1 || !doc.homepage || !Array.isArray(doc.categories) || !Array.isArray(doc.products) || !Array.isArray(doc.banners) || !Array.isArray(doc.promotions)) throw new Error("This content file has an unsupported format.");
     if (!String(doc.homepage.title || "").trim()) throw new Error("Enter a homepage title.");
+    if (doc.homepage.socials !== undefined) {
+      const socials = doc.homepage.socials;
+      if (!socials || typeof socials !== "object" || Array.isArray(socials)) throw new Error("Check your social media links.");
+      for (const key of ["facebook", "instagram", "twitter", "youtube"]) {
+        const value = socials[key];
+        if (value !== undefined && (typeof value !== "string" || (value && (!/^https:\/\//i.test(value) || !link(value))))) throw new Error("Social media links must be complete HTTPS URLs, or left blank.");
+      }
+    }
     if (doc.homepage.promises !== undefined) {
       if (!Array.isArray(doc.homepage.promises) || doc.homepage.promises.length > 8) throw new Error("Use up to eight store promises.");
       for (const promise of doc.homepage.promises) {
