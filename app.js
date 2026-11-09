@@ -1021,6 +1021,7 @@ function renderAccount() {
   const row = (href, ico, title, sub, ext) => `<a class="acct-row" href="${href}"${ext ? ' target="_blank" rel="noopener"' : ""}>${ico}<span><strong>${title}</strong><small>${sub}</small></span>${CHEV}</a>`;
   $("#account-page").innerHTML = `
     <h1 class="page-title">Account</h1>
+    <div id="customer-auth"></div>
     <div class="acct-list">
       <form class="acct-card" id="profile-form">
         <h2>My details</h2><p class="acct-note">Saved on this device and filled in for you at checkout.</p>
@@ -1045,8 +1046,9 @@ function renderAccount() {
           ${[["light", "Light"], ["dark", "Dark"], ["auto", "Auto"]].map(([m, l]) => `<button type="button" data-theme-set="${m}" aria-pressed="${mode === m}">${l}</button>`).join("")}
         </div>
       </div>
-      <p class="acct-note">Sign-in is coming soon. Your cart, favourites, orders and details are saved on this device.</p>
+      <p class="acct-note">Your cart, favourites, order history and delivery details are saved on this device.</p>
     </div>`;
+  window.CustomerAuth?.render();
 }
 
 /* Search suggestions under the search boxes */
