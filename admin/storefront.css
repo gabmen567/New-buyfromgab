@@ -51,6 +51,11 @@
 .editor-image > div { flex: 1; min-width: 0; }
 .editor-image .form-field { margin-bottom: 8px; }
 .editor-image small { font-size: 11px; color: #5e677b; }
+.image-dimensions { font-size: 12px; color: #246637; background: #e8f8ec; padding: 10px 12px; border-radius: 10px; }
+.image-design-note { color: #5e677b; font-size: 13px; line-height: 1.7; }
+.full-design-settings { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.banner-preview.complete-design-preview { display: block; min-height: 0; padding: 0; background: #eef0f7; }
+.banner-preview.complete-design-preview img { display: block; width: 100%; height: auto; object-fit: contain; border-radius: 0; }
 .editor-image input[type="url"] { text-overflow: ellipsis; }
 .editor-row-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 18px; }
 .editor-row-actions .secondary-button { min-height: 38px; }
@@ -67,5 +72,22 @@
 .catalog-filter { width: 100%; height: 44px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
 .danger-button { color: #a32639; }
 .editor-empty { padding: 40px; text-align: center; background: #ffffff; border: 1px dashed var(--line); border-radius: 22px; color: #5e677b; }
+.image-crop-dialog { width: min(900px, calc(100vw - 24px)); max-height: calc(100svh - 24px); overflow: auto; padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: #ffffff; color: #16233b; box-shadow: 0 24px 90px #16233b40; }
+.image-crop-dialog::backdrop { background: #0e172cbb; backdrop-filter: blur(5px); }
+.crop-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+.crop-heading h2 { margin: 8px 0; font: 400 30px/1.2 Georgia, serif; }
+.crop-heading p, .crop-instructions, .crop-message { color: #5e677b; font-size: 13px; line-height: 1.6; }
+.crop-close { width: 44px; height: 44px; flex: none; border: 1px solid var(--line); border-radius: 14px; background: #eef0f7; color: #16233b; font-size: 25px; }
+.crop-stage { position: relative; margin: 24px auto; border-radius: 14px; background: repeating-conic-gradient(#e0e4ed 0 25%, #f2f3f7 0 50%) 0 / 20px 20px; overflow: hidden; box-shadow: 0 0 0 2px #16233b; }
+#crop-canvas { display: block; width: 100%; height: auto; cursor: grab; touch-action: none; }
+#crop-canvas:active { cursor: grabbing; }
+#crop-canvas:focus-visible { outline-offset: -4px; }
+.crop-grid { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent calc(33.333% - .5px), #ffffff66 33.333%, transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), #ffffff66 66.666%, transparent calc(66.666% + .5px)), linear-gradient(transparent calc(33.333% - .5px), #ffffff66 33.333%, transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), #ffffff66 66.666%, transparent calc(66.666% + .5px)); }
+.crop-controls { display: flex; align-items: center; gap: 16px; font-size: 13px; }
+.crop-controls input { flex: 1; min-width: 40px; accent-color: #246637; min-height: 44px; }
+.crop-controls output { min-width: 42px; font-variant-numeric: tabular-nums; }
+.crop-actions { display: flex; justify-content: end; gap: 12px; margin-top: 20px; }
+.crop-message { min-height: 20px; }
+@media (max-width: 600px) { .image-crop-dialog { padding: 20px; } .crop-heading h2 { font-size: 26px; } .crop-controls { gap: 10px; flex-wrap: wrap; } .crop-controls label { width: 100%; } .crop-actions button { flex: 1; min-height: 48px; } }
 @media (max-width: 1050px) { .editor-heading { align-items: start; flex-direction: column; } .catalog-editor { grid-template-columns: minmax(0, 1fr); } .catalog-list { max-height: 200px; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 750px) { .editor-layout { grid-template-columns: minmax(0, 1fr); } .editor-nav { position: static; display: flex; flex-wrap: wrap; gap: 6px; } .editor-nav button { padding: 12px; } .editor-tools { width: 100%; display: flex; flex-wrap: wrap; align-items: center; margin-top: 4px; padding-top: 8px; } .import-label input { max-width: 190px; } .editor-grid { grid-template-columns: minmax(0, 1fr); gap: 0; } .editor-topbar { flex-wrap: wrap; } .editor-image { flex-direction: column; } .editor-image > div { width: 100%; } .editor-actions { width: 100%; } .editor-actions button { flex: 1 1 40%; } #publish-store { flex-basis: 100%; } .editor-gate { margin: 28px 16px; } .banner-preview img { width: 50px; } .banner-preview { gap: 10px; padding: 18px; } }

@@ -13,6 +13,23 @@ Open `/admin/storefront.html`, or choose **Edit storefront** in the admin sideba
 
 Image uploads support PNG, JPG, WebP, GIF and AVIF. Decorative banner/category images have empty alt text; product images use the product name. Use well-cropped transparent artwork for category tiles and separate desktop banner images. HTTP and script URLs are rejected.
 
+### Uploading complete designs
+
+Products have a direct **Upload product photo** file picker; recommended size is **1200 × 1200 px**. The editor reports the uploaded file's actual dimensions. You can still use a full HTTPS image URL.
+
+For categories and banners, click **Upload desktop design & crop** to upload a finished composition containing your own text and artwork. Drag the image within the fixed crop frame, zoom with the slider (or mouse wheel), and choose **Apply crop**. Arrow keys reposition a focused image; **Reset** restores its initial centered position. Applying a desktop image automatically enables complete-design mode, replacing the standard text/artwork overlays. Use the separate mobile upload for a different mobile crop. **Cancel** or Escape leaves the existing image unchanged and uploads nothing. Product photo uploads also use a square crop frame.
+
+Crops are exported at the exact dimensions listed below as WebP (or PNG if the browser cannot encode WebP). Source uploads can be up to 20 MB; saved images remain subject to the 5 MB connected-store limit or 1 MB local-preview limit. Animated sources are flattened to the selected still image. Re-upload a source to choose a different crop. Pasting an image URL bypasses cropping. Category names, banner headings and promotion headlines remain useful for navigation and accessible labels. Existing content remains compatible and standard layouts remain available when complete-design mode is off. No extra SQL migration is needed.
+
+| Placement | Desktop design | Optional mobile design |
+| --- | --- | --- |
+| Standard category tile | 900 × 600 px (3:2) | 800 × 800 px (1:1) |
+| Wide category tile | 1800 × 600 px (3:1) | 1600 × 800 px (2:1) |
+| Category page banner, including All products | 1600 × 400 px (4:1) | 800 × 400 px (2:1) |
+| Homepage promotional banner | 1200 × 600 px (2:1) | 800 × 400 px (2:1) |
+
+The crop tool exports these exact sizes. Existing or URL-based images can have other dimensions: the storefront preserves the whole saved image using `object-fit: contain`, so a different aspect ratio can leave background space. On screens below 1100 px, the mobile image is used when supplied, otherwise the desktop image is reused. Keep important text/logos inset from the crop edges to allow for rounded corners. Save and preview both screen sizes before publishing.
+
 Download a backup before making substantial changes. Restore loads the JSON into an unsaved draft and does not publish automatically. Keep backups private if they contain unreleased catalog information. A version check prevents overwriting a newer save from another tab/editor; download a backup and reload if this happens.
 
 ## Connect Supabase for publishing to every visitor

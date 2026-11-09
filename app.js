@@ -173,6 +173,7 @@ const trackUrlFor = (ref) => "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + enc
 const ARROW_UR = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg>`;
 const ARROW_R = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M13 5l7 7-7 7"/></svg>`;
 function categoryTileHTML(c, selectedCategory = "") {
+  if (c.fullImageMode && c.fullImage) return `<a class="tile full-image${c.wide ? " tile-wide" : ""}" href="#/c/${c.id}" data-cat="${c.id}" aria-label="${esc(c.name)}">${fullDesignHTML(c)}</a>`;
   const m = c.lines.map(esc).join("<br>");
   const d = c.dlines.map(esc).join("<br>");
   const a = c.art;
@@ -1476,6 +1477,10 @@ window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syn
 })();
 
 /* Apply only published content, except in an explicitly requested admin preview. */
+function fullDesignHTML(item) {
+  const cms = window.StoreContent;
+  return `<picture class="full-design">${item.mobileImage ? `<source media="(max-width: 1099px)" srcset="${esc(cms.image(item.mobileImage))}">` : ""}<img src="${esc(cms.image(item.fullImage))}" alt="" decoding="async"></picture>`;
+}
 function applyEditedBanner() {
   const edited = storefrontContent?.banners.find(b => b.id === filter);
   if (!edited) return;
@@ -1484,6 +1489,11 @@ function applyEditedBanner() {
   mobile.hidden = edited.visible === false;
   desktop.style.backgroundColor = edited.color;
   mobile.style.backgroundColor = edited.color;
+  for (const container of [desktop, mobile]) {
+    container.querySelector(".full-design")?.remove();
+    container.classList.toggle("full-image", Boolean(edited.fullImageMode && edited.fullImage));
+    if (edited.fullImageMode && edited.fullImage) container.insertAdjacentHTML("beforeend", fullDesignHTML(edited));
+  }
   if (edited.title) $("#banner-title").textContent = edited.title;
   if (edited.subtitle) $("#banner-sub").textContent = edited.subtitle;
   for (const [selector, source] of [["#banner-left", edited.left], ["#banner-right", edited.right]]) {
@@ -1493,7 +1503,7 @@ function applyEditedBanner() {
   const title = mobile.querySelector("strong"), subtitle = mobile.querySelector(".mb-text span");
   if (title && edited.title) title.textContent = edited.title;
   if (subtitle && edited.subtitle) subtitle.textContent = edited.subtitle;
-  const img = mobile.querySelector("img");
+  const img = mobile.querySelector(":scope > img");
   if (img) { img.hidden = !edited.right; if (edited.right) img.src = window.StoreContent.image(edited.right); }
 }
 function applyStorefrontDocument(content) {
@@ -1523,7 +1533,7 @@ function applyStorefrontDocument(content) {
   $(".f-connect > p").textContent = home.newsletterText || "";
   let promotions = $("#store-promotions");
   if (!promotions) { promotions = document.createElement("div"); promotions.id = "store-promotions"; promotions.className = "store-promotions"; $(".hero-sub").after(promotions); }
-  promotions.innerHTML = content.promotions.filter(b => b.visible !== false).map(b => `<a class="store-promotion" href="${esc(window.StoreContent.link(b.link) || "#/all")}" style="background-color:${esc(b.color)}"><div><h2>${esc(b.title)}</h2><p>${esc(b.subtitle || "")}</p><span>${esc(b.cta || "Shop now")} →</span></div>${b.image ? `<img src="${esc(window.StoreContent.image(b.image))}" alt="">` : ""}</a>`).join("");
+  promotions.innerHTML = content.promotions.filter(b => b.visible !== false).map(b => b.fullImageMode && b.fullImage ? `<a class="store-promotion full-image" href="${esc(window.StoreContent.link(b.link) || "#/all")}" aria-label="${esc(b.title || "Shop collection")}">${fullDesignHTML(b)}</a>` : `<a class="store-promotion" href="${esc(window.StoreContent.link(b.link) || "#/all")}" style="background-color:${esc(b.color)}"><div><h2>${esc(b.title)}</h2><p>${esc(b.subtitle || "")}</p><span>${esc(b.cta || "Shop now")} →</span></div>${b.image ? `<img src="${esc(window.StoreContent.image(b.image))}" alt="">` : ""}</a>`).join("");
   buildDeskUI(); renderTiles(); renderCart(); route();
 }
 let storefrontVersion = -1;

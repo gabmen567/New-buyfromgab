@@ -1,0 +1,21 @@
+# Deploy the static storefront and admin assets, excluding local tools and data.
+.git/
+.vercel/
+.agents/
+.codex/
+.aws/
+.env*
+.image-browser*/
+.crop-browser*/
+.preview-browser*/
+.login-browser*/
+.admin-browser*/
+.cms-browser*/
+.deploy*/
+supabase/
+README.md
+admin/*.md
+.*check*.html
+.*check*.js
+.*qa*.ps1
+*-check*.png

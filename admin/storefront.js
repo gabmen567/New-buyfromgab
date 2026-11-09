@@ -24,9 +24,17 @@
   function select(label, path, values) {
     return `<label class="form-field">${esc(label)}<select data-bind="${path}">${values.map(([value, name]) => `<option value="${esc(value)}" ${get(path) === value ? "selected" : ""}>${esc(name)}</option>`).join("")}</select></label>`;
   }
-  function imageField(label, path) {
+  function imageField(label, path, dimensions = "") {
     const source = cms.image(get(path));
-    return `<div class="editor-image">${source ? `<img src="${esc(source)}" alt="${esc(label)} preview">` : ""}<div><label class="form-field">${esc(label)} · Image URL<input type="url" data-bind="${path}" value="${source.startsWith("data:") ? "" : esc(source)}" placeholder="${source.startsWith("data:") ? "Uploaded image · paste a URL to replace" : "https://…"}"></label><label class="form-field">Or upload an image<input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" data-upload="${path}"></label><small>PNG, JPG, WebP, GIF or AVIF · ${cms.remote ? "5 MB" : "1 MB in local mode"} maximum</small>${source ? `<button type="button" class="small-action" data-clear-image="${path}">Remove image</button>` : ""}</div></div>`;
+    const crop = /(?:fullImage|mobileImage|\.img)$/.test(path) && dimensions.match(/(\d+)\s*×\s*(\d+)/);
+    const cropAttributes = crop ? `data-crop-width="${crop[1]}" data-crop-height="${crop[2]}"` : "";
+    return `<div class="editor-image">${source ? `<img src="${esc(source)}" alt="${esc(label)} preview">` : ""}<div><label class="form-field">Upload ${esc(label.toLowerCase())}${crop ? " & crop" : ""}<input type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" data-upload="${path}" ${cropAttributes}></label>${dimensions ? `<p class="image-dimensions">${crop ? "Crop output" : "Recommended"}: <strong>${esc(dimensions)}</strong></p>` : ""}<label class="form-field">Or paste an image URL<input type="url" data-bind="${path}" value="${source.startsWith("data:") ? "" : esc(source)}" placeholder="${source.startsWith("data:") ? "Uploaded image · paste a URL to replace" : "https://…"}"></label><small>PNG, JPG, WebP, GIF or AVIF · ${crop ? "Source up to 20 MB; " : ""}${cms.remote ? "5 MB" : "1 MB in local mode"} ${crop ? "saved image" : "maximum"}</small>${source ? `<button type="button" class="small-action" data-clear-image="${path}">Remove image</button>` : ""}</div></div>`;
+  }
+  function fullDesignControls(path, type) {
+    const item = get(path), category = type === "category";
+    const desktop = category ? item.wide ? "1800 × 600 px (3:1)" : "900 × 600 px (3:2)" : type === "banner" ? "1600 × 400 px (4:1)" : "1200 × 600 px (2:1)";
+    const mobile = category ? item.wide ? "1600 × 800 px (2:1)" : "800 × 800 px (1:1)" : "800 × 400 px (2:1)";
+    return `<div class="full-design-settings"><p class="image-design-note">Upload your finished design, then drag and zoom it inside the crop frame. Applying a desktop design automatically replaces the website’s text and artwork overlays.</p>${imageField("Desktop design", path + ".fullImage", desktop)}${imageField("Mobile design (optional)", path + ".mobileImage", mobile)}${check("Use the complete design instead of the standard layout", path + ".fullImageMode")}</div>`;
   }
   function sectionHead(title, text, action = "") {
     return `<div class="editor-section-head"><div><h2>${title}</h2><p>${text}</p></div>${action}</div>`;
@@ -36,6 +44,7 @@
   }
   function bannerPreview(path) {
     const banner = get(path);
+    if (banner.fullImageMode && banner.fullImage) return `<div class="banner-preview complete-design-preview"><img src="${esc(cms.image(banner.fullImage))}" alt="Complete design preview"></div>`;
     return `<div class="banner-preview" data-preview="${path}" style="background-color:${esc(banner.color)}">${banner.left ? `<img src="${esc(cms.image(banner.left))}" alt="">` : ""}<div><strong>${esc(banner.title)}</strong><p>${esc(banner.subtitle || "")}</p></div>${banner.right || banner.image ? `<img src="${esc(cms.image(banner.right || banner.image))}" alt="">` : ""}</div>`;
   }
   function render() {
@@ -44,19 +53,19 @@
     });
     let html = "";
     if (section === "homepage") html = sectionHead("The first impression", "Shape the words that welcome customers into your store.") + `<div class="editor-panel">${field("Main heading", "homepage.title")}${field("Introduction", "homepage.subtitle", "textarea")}${field("Small heading above the title", "homepage.kicker")}${check("Show delivery, returns, support and payment promises", "homepage.showBenefits")}</div><div class="editor-panel"><h2>Footer & updates</h2>${field("Updates heading", "homepage.newsletterTitle")}${field("Updates description", "homepage.newsletterText", "textarea")}${field("About the store", "homepage.footerText", "textarea")}</div>`;
-    if (section === "categories") html = sectionHead("A colourful collection", "Edit category names, artwork, colours and their order. Hidden categories and their products disappear from the storefront.") + doc.categories.map((c, i) => `<div class="editor-panel"><span class="editor-number">Category ${i + 1} · ${esc(c.id)}</span><div class="editor-grid"><div>${field("Category name", `categories.${i}.name`)}${field("Background colour", `categories.${i}.color`, "color")}${field("Button label (optional)", `categories.${i}.cta`)}${check("Visible in store", `categories.${i}.visible`)}${check("Wide homepage tile", `categories.${i}.wide`)}</div><div>${imageField("Category artwork", `categories.${i}.image`)}</div></div>${reorder("categories", i, doc.categories.length)}</div>`).join("");
+    if (section === "categories") html = sectionHead("A colourful collection", "Edit category names, artwork, colours and their order. Hidden categories and their products disappear from the storefront.") + doc.categories.map((c, i) => `<div class="editor-panel"><span class="editor-number">Category ${i + 1} · ${esc(c.id)}</span><div class="editor-grid"><div>${field("Category name", `categories.${i}.name`)}${field("Background colour", `categories.${i}.color`, "color")}${field("Button label (optional)", `categories.${i}.cta`)}${check("Visible in store", `categories.${i}.visible`)}${check("Wide homepage tile", `categories.${i}.wide`)}</div><div>${fullDesignControls(`categories.${i}`, "category")}${!c.fullImageMode ? imageField("Category artwork", `categories.${i}.image`, "600 × 600 px, transparent background") : ""}</div></div>${reorder("categories", i, doc.categories.length)}</div>`).join("");
     if (section === "banners") {
       const i = Math.min(bannerIndex, doc.banners.length - 1), path = `banners.${i}`;
-      html = sectionHead("Banners for every aisle", "Change the heading, background and both images on each category page.") + `<div class="editor-panel"><label class="form-field">Choose a page<select id="banner-picker">${doc.banners.map((b, index) => `<option value="${index}" ${index === i ? "selected" : ""}>${esc(b.id === "all" ? "All products" : doc.categories.find(c => c.id === b.id)?.name || b.id)}</option>`).join("")}</select></label>${bannerPreview(path)}${field("Banner heading", path + ".title")}${field("Supporting text", path + ".subtitle")}${field("Background colour", path + ".color", "color")}${check("Show this banner", path + ".visible")}<div class="editor-grid"><div>${imageField("Left image", path + ".left")}</div><div>${imageField("Right image (also shown on mobile)", path + ".right")}</div></div></div>`;
+      html = sectionHead("Banners for every aisle", "Change the heading, background and both images on each category page.") + `<div class="editor-panel"><label class="form-field">Choose a page<select id="banner-picker">${doc.banners.map((b, index) => `<option value="${index}" ${index === i ? "selected" : ""}>${esc(b.id === "all" ? "All products" : doc.categories.find(c => c.id === b.id)?.name || b.id)}</option>`).join("")}</select></label>${fullDesignControls(path, section === "banners" ? "banner" : "promotion")}${bannerPreview(path)}${field("Banner heading", path + ".title")}${field("Supporting text", path + ".subtitle")}${field("Background colour", path + ".color", "color")}${check("Show this banner", path + ".visible")}${!get(path).fullImageMode ? `<div class="editor-grid"><div>${imageField("Left image", path + ".left")}</div><div>${imageField("Right image (also shown on mobile)", path + ".right")}</div></div>` : ""}</div>`;
     }
     if (section === "promotions") html = sectionHead("Something worth a closer look", "Promotional banners appear above the homepage category collection.", '<button class="primary-button" type="button" data-add-promotion>＋ Add banner</button>') + (doc.promotions.length ? doc.promotions.map((b, i) => {
       const path = `promotions.${i}`;
-      return `<div class="editor-panel">${bannerPreview(path)}${field("Headline", path + ".title")}${field("Supporting text", path + ".subtitle", "textarea")}<div class="editor-grid">${field("Button label", path + ".cta")}${field("Destination (#/all, #/c/food or HTTPS URL)", path + ".link")}</div>${field("Background colour", path + ".color", "color")}${imageField("Banner image", path + ".image")}${check("Visible in store", path + ".visible")}${reorder("promotions", i, doc.promotions.length)}<div class="editor-row-actions"><button class="secondary-button danger-button" type="button" data-delete-promotion="${i}">Remove banner</button></div></div>`;
+      return `<div class="editor-panel">${fullDesignControls(path, section === "banners" ? "banner" : "promotion")}${bannerPreview(path)}${field("Headline", path + ".title")}${field("Supporting text", path + ".subtitle", "textarea")}<div class="editor-grid">${field("Button label", path + ".cta")}${field("Destination (#/all, #/c/food or HTTPS URL)", path + ".link")}</div>${field("Background colour", path + ".color", "color")}${!b.fullImageMode ? imageField("Banner image", path + ".image") : ""}${check("Visible in store", path + ".visible")}${reorder("promotions", i, doc.promotions.length)}<div class="editor-row-actions"><button class="secondary-button danger-button" type="button" data-delete-promotion="${i}">Remove banner</button></div></div>`;
     }).join("") : '<div class="editor-empty">No promotional banners yet. Add your first banner to feature an offer or collection.</div>');
     if (section === "products") {
       productIndex = Math.min(productIndex, doc.products.length - 1);
       const i = productIndex, p = doc.products[i], path = `products.${i}`;
-      html = sectionHead("Your storefront catalog", "These are the products customers see after you publish. Check prices and stock before publishing.", '<button class="primary-button" type="button" data-add-product>＋ Add product</button>') + `<div class="catalog-editor"><div><input class="catalog-filter" id="catalog-search" type="search" placeholder="Find a product…" aria-label="Search catalog" value="${esc(query)}"><div class="catalog-list" id="catalog-list">${productList()}</div></div>${p ? `<div class="editor-panel"><span class="editor-number">Product ${p.id}</span>${field("Product name", path + ".name")}${field("Description", path + ".desc", "textarea")}${field("Brand", path + ".brand")}<div class="editor-grid">${select("Category", path + ".cat", doc.categories.map(c => [c.id, c.name]))}${select("Subcategory", path + ".sub", (window.StoreCatalog.SUBCATS[p.cat] || []).map(s => [s.id, s.name]))}</div><div class="editor-grid">${field("Selling price (GHS)", path + ".price", "number", 'min="0" step="0.01"')}${field("Original price (0 for no discount)", path + ".oldPrice", "number", 'min="0" step="0.01"')}${field("Stock available (blank = not tracked)", path + ".stock", "number", 'min="0" step="1"')}${field("Fallback emoji", path + ".emoji")}</div>${imageField("Product photo", path + ".img")}${check("Visible in store", path + ".visible")}${check("New arrival", path + ".isNew")}${check("Best seller", path + ".best")}${check("Flash sale (set an original price too)", path + ".flash")}<div class="editor-row-actions"><button class="secondary-button danger-button" type="button" data-delete-product="${i}">Delete product</button></div></div>` : '<div class="editor-empty">Your catalog is empty. Add a product to start.</div>'}</div>`;
+      html = sectionHead("Your storefront catalog", "These are the products customers see after you publish. Check prices and stock before publishing.", '<button class="primary-button" type="button" data-add-product>＋ Add product</button>') + `<div class="catalog-editor"><div><input class="catalog-filter" id="catalog-search" type="search" placeholder="Find a product…" aria-label="Search catalog" value="${esc(query)}"><div class="catalog-list" id="catalog-list">${productList()}</div></div>${p ? `<div class="editor-panel"><span class="editor-number">Product ${p.id}</span>${field("Product name", path + ".name")}${field("Description", path + ".desc", "textarea")}${field("Brand", path + ".brand")}<div class="editor-grid">${select("Category", path + ".cat", doc.categories.map(c => [c.id, c.name]))}${select("Subcategory", path + ".sub", (window.StoreCatalog.SUBCATS[p.cat] || []).map(s => [s.id, s.name]))}</div><div class="editor-grid">${field("Selling price (GHS)", path + ".price", "number", 'min="0" step="0.01"')}${field("Original price (0 for no discount)", path + ".oldPrice", "number", 'min="0" step="0.01"')}${field("Stock available (blank = not tracked)", path + ".stock", "number", 'min="0" step="1"')}${field("Fallback emoji", path + ".emoji")}</div>${imageField("Product photo", path + ".img", "1200 × 1200 px (1:1)")}${check("Visible in store", path + ".visible")}${check("New arrival", path + ".isNew")}${check("Best seller", path + ".best")}${check("Flash sale (set an original price too)", path + ".flash")}<div class="editor-row-actions"><button class="secondary-button danger-button" type="button" data-delete-product="${i}">Delete product</button></div></div>` : '<div class="editor-empty">Your catalog is empty. Add a product to start.</div>'}</div>`;
     }
     $("#content-fields").innerHTML = html;
   }
@@ -106,19 +115,40 @@
     if (input.id === "catalog-search") { query = input.value; $("#catalog-list").innerHTML = productList(); return; }
     if (!input.dataset.bind) return;
     set(input.dataset.bind, input.type === "checkbox" ? input.checked : input.type === "number" ? (input.dataset.bind.endsWith(".stock") && input.value === "" ? null : Number(input.value)) : input.value);
+    if (input.dataset.bind.endsWith(".fullImageMode") || input.dataset.bind.endsWith(".wide")) { render(); return; }
     if (input.dataset.bind.endsWith(".cat")) {
       const p = doc.products[productIndex]; p.sub = window.StoreCatalog.SUBCATS[p.cat]?.[0]?.id || ""; render();
     }
     document.querySelectorAll("[data-preview]").forEach(preview => {
       const banner = get(preview.dataset.preview); preview.style.backgroundColor = banner.color;
-      preview.querySelector("strong").textContent = banner.title;
-      preview.querySelector("p").textContent = banner.subtitle || "";
+      const title = preview.querySelector("strong"), text = preview.querySelector("p");
+      if (title) title.textContent = banner.title;
+      if (text) text.textContent = banner.subtitle || "";
     });
   });
-  $("#content-fields").addEventListener("change", event => {
+  $("#content-fields").addEventListener("change", async event => {
     if (event.target.id === "banner-picker") { bannerIndex = Number(event.target.value); render(); }
-    const path = event.target.dataset.upload, file = event.target.files?.[0];
-    if (path && file) operation(async () => { const source = await cms.upload(file); set(path, source); render(); status("Image added to the draft. Publish to show it in your store."); });
+    if (/\.(fullImage|mobileImage)$/.test(event.target.dataset.bind || "")) render();
+    const path = event.target.dataset.upload;
+    let file = event.target.files?.[0];
+    if (path && file && event.target.dataset.cropWidth) {
+      try {
+        file = await window.ImageCropper.open(file, { width: Number(event.target.dataset.cropWidth), height: Number(event.target.dataset.cropHeight) });
+        event.target.value = "";
+        if (!file) return;
+      } catch (error) { event.target.value = ""; status(error.message, true); return; }
+    }
+    if (path && file) operation(async () => {
+      const temporaryURL = URL.createObjectURL(file), picture = new Image();
+      let width, height;
+      try { picture.src = temporaryURL; await picture.decode(); width = picture.naturalWidth; height = picture.naturalHeight; }
+      catch { throw new Error("This image could not be opened. Choose a valid PNG, JPG, WebP, GIF or AVIF file."); }
+      finally { URL.revokeObjectURL(temporaryURL); }
+      const source = await cms.upload(file); set(path, source);
+      if (path.endsWith(".fullImage")) set(path.replace(/\.fullImage$/, ".fullImageMode"), true);
+      render();
+      status(`Image uploaded: ${width} × ${height} px. Saved in the unsaved draft; publish to show it in your store.`);
+    });
   });
   document.addEventListener("click", event => {
     if (busy || !doc) return;

@@ -41,6 +41,7 @@
       if (!categoryDefinitions.some(original => original.id === c.id) || ids.has(c.id) || typeof c.name !== "string" || !c.name.trim() || !/^#[0-9a-f]{6}$/i.test(c.color)) throw new Error("Check the category names, identifiers and colours.");
       ids.add(c.id);
       if (c.image && !image(c.image)) throw new Error("Category images must be HTTPS URLs or uploaded images.");
+      validateFullDesign(c);
     }
     if (ids.size !== categoryDefinitions.length) throw new Error("The category list is incomplete.");
     const products = new Set();
@@ -53,12 +54,17 @@
     }
     if (doc.banners.length !== ids.size + 1 || new Set(doc.banners.map(b => b.id)).size !== doc.banners.length) throw new Error("The banner list is incomplete.");
     for (const b of [...doc.banners, ...doc.promotions]) {
+      validateFullDesign(b);
       if (!/^#[0-9a-f]{6}$/i.test(b.color)) throw new Error("Choose a valid banner colour.");
       for (const field of ["image", "left", "right"]) if (b[field] && !image(b[field])) throw new Error("Banner images must be HTTPS URLs or uploaded images.");
       if (b.link && !link(b.link)) throw new Error("Use a shop link such as #/all or a full HTTPS URL.");
     }
     if (doc.banners.some(b => b.id !== "all" && !ids.has(b.id))) throw new Error("A banner references an unknown category.");
     return doc;
+  }
+  function validateFullDesign(item) {
+    for (const field of ["fullImage", "mobileImage"]) if (item[field] && !image(item[field])) throw new Error("Full designs must be uploaded images or HTTPS image URLs.");
+    if (item.fullImageMode && !item.fullImage) throw new Error("Upload a complete desktop design, or turn off full-image mode before saving.");
   }
   function localRead(id) {
     const stored = localStorage.getItem(key + id);
