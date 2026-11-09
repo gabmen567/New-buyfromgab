@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const output = join(root, "dist");
 const files = [
-  "index.html", "app.js", "styles.css", "classic.css", "typography.css", "catalog-defaults.js",
+  "index.html", "login.html", "customer-auth.css", "app.js", "styles.css", "classic.css", "typography.css", "catalog-defaults.js",
   "store-config.js", "store-content.js", "customer-auth.js", "track-order.js", "theme-init.js",
   "assets/fonts/Ubuntu-Regular.ttf", "assets/fonts/Ubuntu-Medium.ttf", "assets/fonts/Ubuntu-Bold.ttf", "assets/fonts/UFL.txt",
   "admin/index.html", "admin/app.js", "admin/styles.css", "admin/classic.css",
