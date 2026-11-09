@@ -1,4 +1,3 @@
-try{var t=localStorage.getItem("bazaar-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}
 
 /* Settings: currency, WhatsApp number, payment options */
 
@@ -653,16 +652,12 @@ function trackUrl() {
 function updateTrackLink() { /* "Track your order" opens the Track page */ }
 
 function savedTheme() {
-  try { const t = localStorage.getItem("bazaar-theme"); return t === "light" || t === "dark" ? t : "auto"; } catch (e) { return document.documentElement.getAttribute("data-theme") || "auto"; }
+  try { const t = localStorage.getItem("bazaar-theme"); return ["light", "dark", "auto"].includes(t) ? t : "light"; } catch (e) { return document.documentElement.getAttribute("data-theme") || "light"; }
 }
 function applyTheme(mode) {
-  if (mode === "auto") {
-    document.documentElement.removeAttribute("data-theme");
-    try { localStorage.removeItem("bazaar-theme"); } catch (e) {}
-  } else {
-    document.documentElement.setAttribute("data-theme", mode);
-    try { localStorage.setItem("bazaar-theme", mode); } catch (e) {}
-  }
+  if (!["light", "dark", "auto"].includes(mode)) mode = "light";
+  document.documentElement.setAttribute("data-theme", mode);
+  try { localStorage.setItem("bazaar-theme", mode); } catch (e) {}
   syncThemeSwitch();
 }
 /* desktop header helpers */
@@ -673,7 +668,10 @@ function closeUPops() {
 }
 const MOON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.500 8.500 0 1 1 9.500 4a7 7 0 0 0 10.500 10.500z"/></svg>`;
 const SUN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.900 4.900l1.400 1.400M17.700 17.700l1.400 1.400M2 12h2M20 12h2M4.900 19.100l1.400-1.400M17.700 6.300l1.400-1.400"/></svg>`;
-const effectiveTheme = () => document.documentElement.getAttribute("data-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+const effectiveTheme = () => {
+  const mode = document.documentElement.getAttribute("data-theme") || "light";
+  return mode === "auto" ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") : mode;
+};
 function syncThemeSwitch() {
   const sw = $("#theme-switch"); if (!sw) return;
   const dark = effectiveTheme() === "dark";

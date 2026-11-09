@@ -6,7 +6,7 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const output = join(root, "dist");
 const files = [
   "index.html", "app.js", "styles.css", "classic.css", "catalog-defaults.js",
-  "store-config.js", "store-content.js", "track-order.js",
+  "store-config.js", "store-content.js", "track-order.js", "theme-init.js",
   "admin/index.html", "admin/app.js", "admin/styles.css", "admin/classic.css",
   "admin/storefront.html", "admin/storefront.js", "admin/storefront.css", "admin/image-cropper.js",
   "help/index.html", "shipping/index.html", "returns/index.html", "track-order/index.html"
