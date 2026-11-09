@@ -6,6 +6,42 @@
   const base = String(config.supabaseUrl || "").replace(/\/$/, "");
   const key = "buyfromgab-content-v1-", sessionKey = key + "session";
   const clone = value => JSON.parse(JSON.stringify(value));
+  const typographyGroups = {
+    categories: { label: "Storefront category names", selector: ".tile .tile-title", desktop: 27, mobile: 18 },
+    navigation: { label: "Category navigation", selector: ".pill,.chip,.side-cat", desktop: 14, mobile: 13 },
+    headings: { label: "Page and section titles", selector: ".hero-title,.page-title,.shop-head h1,.pd h1,.sec-title,.related-title", desktop: 36, mobile: 24 },
+    banners: { label: "Banner headings", selector: ".banner-text h1,.mb-text strong,.store-promotion h2", desktop: 34, mobile: 22 },
+    bannerText: { label: "Banner supporting text", selector: ".banner-text p,.mb-text span,.store-promotion p", desktop: 14, mobile: 13 },
+    products: { label: "Product names", selector: ".card-name", desktop: 15, mobile: 14 },
+    prices: { label: "Product prices", selector: ".price,.pd-price", desktop: 20, mobile: 18 },
+    promises: { label: "Store promise titles", selector: ".benefits strong", desktop: 14, mobile: 12 },
+    promiseText: { label: "Store promise descriptions", selector: ".benefits small", desktop: 12, mobile: 11 },
+    footerTitles: { label: "Footer titles", selector: ".f-connect h2,.f-title", desktop: 28, mobile: 24 },
+    footerText: { label: "Footer text", selector: ".f-brand p,.f-connect p,.f-contact,.f-bottom", desktop: 13, mobile: 12 }
+  };
+  function validateTypography(settings) {
+    if (settings === undefined) return;
+    if (!settings || typeof settings !== "object" || Array.isArray(settings)) throw new Error("Check the font size settings.");
+    for (const [key, sizes] of Object.entries(settings)) {
+      if (!Object.hasOwn(typographyGroups, key) || !sizes || typeof sizes !== "object" || Array.isArray(sizes)) throw new Error("Unknown font size group.");
+      for (const [device, value] of Object.entries(sizes)) {
+        if (!["desktop", "mobile"].includes(device) || (value !== null && (!Number.isInteger(value) || value < 10 || value > 72))) throw new Error("Font sizes must be whole numbers between 10 and 72 px, or blank for automatic sizing.");
+      }
+    }
+  }
+  function typographyCSS(settings) {
+    validateTypography(settings);
+    const rules = device => Object.entries(typographyGroups).map(([key, group]) => {
+      const value = settings?.[key]?.[device];
+      return value == null ? "" : `${group.selector}{font-size:${value}px!important;line-height:1.25;overflow-wrap:anywhere;}`;
+    }).join("\n");
+    return `@media(max-width:1099px){${rules("mobile")}}\n@media(min-width:1100px){${rules("desktop")}}`;
+  }
+  function applyTypography(settings) {
+    let style = document.getElementById("store-font-sizes");
+    if (!style) { style = document.createElement("style"); style.id = "store-font-sizes"; document.head.append(style); }
+    style.textContent = typographyCSS(settings);
+  }
   const catalog = window.StoreCatalog;
   const categoryDefinitions = clone(catalog.CATEGORIES);
   const colours = { food: "#62dfb3", home: "#ffb46b", bath: "#f5d665", pharm: "#c8a5f5", tech: "#9cde65", cloth: "#f69fbb", beauty: "#7ed8da", toys: "#ffa28d", building: "#93bdf5", auto: "#b8ce78" };
@@ -55,6 +91,7 @@
     };
   }
   function validate(doc) {
+    validateTypography(doc?.typography);
     if (!doc || doc.schema !== 1 || !doc.homepage || !Array.isArray(doc.categories) || !Array.isArray(doc.products) || !Array.isArray(doc.banners) || !Array.isArray(doc.promotions)) throw new Error("This content file has an unsupported format.");
     if (!String(doc.homepage.title || "").trim()) throw new Error("Enter a homepage title.");
     if (doc.homepage.socials !== undefined) {
@@ -160,7 +197,7 @@
     return base + "/storage/v1/object/public/storefront-media/" + path;
   }
   const initialContent = defaults();
-  window.StoreContent = { remote, defaults: () => clone(initialContent), defaultPromises, promiseIcons, promiseIcon, validate, image, link, clone, read, write, upload, signIn, getSession, signOut: async () => {
+  window.StoreContent = { typographyGroups, typographyCSS, applyTypography, remote, defaults: () => clone(initialContent), defaultPromises, promiseIcons, promiseIcon, validate, image, link, clone, read, write, upload, signIn, getSession, signOut: async () => {
     try { if (remote && getSession()) await request("/auth/v1/logout", { auth: true, method: "POST" }); }
     finally { sessionStorage.removeItem(sessionKey); }
   }, storageKey: key };

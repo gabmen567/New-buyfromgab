@@ -1512,6 +1512,7 @@ function applyEditedBanner() {
 }
 function applyStorefrontDocument(content) {
   window.StoreContent.validate(content);
+  window.StoreContent.applyTypography(content.typography);
   storefrontContent = content;
   const originals = window.StoreContent.defaults().categories;
   const baseCategories = initialCategoryLayout;

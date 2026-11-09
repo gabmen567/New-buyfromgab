@@ -3,7 +3,7 @@
   const cms = window.StoreContent, $ = s => document.querySelector(s);
   const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   let doc, draftVersion = 0, publishedVersion = 0, dirty = false, busy = false;
-  let section = ["homepage", "categories", "banners", "promotions", "products"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "homepage";
+  let section = ["homepage", "categories", "banners", "promotions", "products", "typography"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "homepage";
   let productIndex = 0, bannerIndex = 0, query = "";
   const get = path => path.split(".").reduce((value, part) => value?.[part], doc);
   function set(path, value) {
@@ -65,12 +65,15 @@
     });
   }
   function render() {
+    if (!doc.typography) doc.typography = {};
+    for (const key of Object.keys(cms.typographyGroups)) if (!doc.typography[key]) doc.typography[key] = {};
     if (doc.homepage.promises === undefined) doc.homepage.promises = cms.defaultPromises();
     if (doc.homepage.socials === undefined) doc.homepage.socials = { facebook: "", instagram: "", twitter: "", youtube: "" };
     document.querySelectorAll("[data-section]").forEach(button => {
       if (button.dataset.section === section) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
     });
     let html = "";
+    if (section === "typography") html = sectionHead("Font sizes, grouped your way", "Adjust each group separately for desktop and mobile. Leave a size blank to keep the original responsive design.", '<button type="button" class="secondary-button" data-reset-fonts>Reset all sizes</button>') + '<div class="editor-panel"><p>Sizes are in pixels (10–72). Save a draft and use Preview to review the actual storefront before publishing. Text inside uploaded designs is part of the image and is edited in your design file.</p></div>' + Object.entries(cms.typographyGroups).map(([key, group]) => `<div class="editor-panel"><h2>${esc(group.label)}</h2><div class="editor-grid">${field("Desktop size (px)", `typography.${key}.desktop`, "number", `min="10" max="72" step="1" placeholder="Auto (example ${group.desktop})"`)}${field("Mobile size (px)", `typography.${key}.mobile`, "number", `min="10" max="72" step="1" placeholder="Auto (example ${group.mobile})"`)}</div><p class="font-size-sample" data-font-sample="${key}">Your ${esc(group.label.toLowerCase())}</p><button type="button" class="small-action" data-reset-font="${key}">Reset this group</button></div>`).join("");
     if (section === "homepage") html = sectionHead("The first impression", "Shape the words that welcome customers into your store.") + `<div class="editor-panel">${field("Main heading", "homepage.title")}${field("Introduction", "homepage.subtitle", "textarea")}${field("Small heading above the title", "homepage.kicker")}</div>${promisesEditor()}<div class="editor-panel"><h2>Footer & updates</h2>${field("Updates heading", "homepage.newsletterTitle")}${field("Updates description", "homepage.newsletterText", "textarea")}${field("About the store", "homepage.footerText", "textarea")}</div><div class="editor-panel"><h2>Social media links</h2><p>Icons appear beside WhatsApp in the footer. Add your profile links to make them clickable; leave a link blank to show its icon without a link.</p>${field("Facebook profile URL", "homepage.socials.facebook", "url")}${field("Instagram profile URL", "homepage.socials.instagram", "url")}${field("X (Twitter) profile URL", "homepage.socials.twitter", "url")}${field("YouTube channel URL", "homepage.socials.youtube", "url")}</div>`;
     if (section === "categories") html = sectionHead("A colourful collection", "Edit category names, artwork, colours and their order. Hidden categories and their products disappear from the storefront.") + doc.categories.map((c, i) => `<div class="editor-panel"><span class="editor-number">Category ${i + 1} · ${esc(c.id)}</span><div class="editor-grid"><div>${field("Category name", `categories.${i}.name`)}${field("Background colour", `categories.${i}.color`, "color")}${field("Button label (optional)", `categories.${i}.cta`)}${check("Visible in store", `categories.${i}.visible`)}${check("Wide homepage tile", `categories.${i}.wide`)}</div><div>${fullDesignControls(`categories.${i}`, "category")}${!c.fullImageMode ? imageField("Category artwork", `categories.${i}.image`, "600 × 600 px, transparent background") : ""}</div></div>${reorder("categories", i, doc.categories.length)}</div>`).join("");
     if (section === "banners") {
@@ -87,7 +90,15 @@
       html = sectionHead("Your storefront catalog", "These are the products customers see after you publish. Check prices and stock before publishing.", '<button class="primary-button" type="button" data-add-product>＋ Add product</button>') + `<div class="catalog-editor"><div><input class="catalog-filter" id="catalog-search" type="search" placeholder="Find a product…" aria-label="Search catalog" value="${esc(query)}"><div class="catalog-list" id="catalog-list">${productList()}</div></div>${p ? `<div class="editor-panel"><span class="editor-number">Product ${p.id}</span>${field("Product name", path + ".name")}${field("Description", path + ".desc", "textarea")}${field("Brand", path + ".brand")}<div class="editor-grid">${select("Category", path + ".cat", doc.categories.map(c => [c.id, c.name]))}${select("Subcategory", path + ".sub", (window.StoreCatalog.SUBCATS[p.cat] || []).map(s => [s.id, s.name]))}</div><div class="editor-grid">${field("Selling price (GHS)", path + ".price", "number", 'min="0" step="0.01"')}${field("Original price (0 for no discount)", path + ".oldPrice", "number", 'min="0" step="0.01"')}${field("Stock available (blank = not tracked)", path + ".stock", "number", 'min="0" step="1"')}${field("Fallback emoji", path + ".emoji")}</div>${imageField("Product photo", path + ".img", "1200 × 1200 px (1:1)")}${check("Visible in store", path + ".visible")}${check("New arrival", path + ".isNew")}${check("Best seller", path + ".best")}${check("Flash sale (set an original price too)", path + ".flash")}<div class="editor-row-actions"><button class="secondary-button danger-button" type="button" data-delete-product="${i}">Delete product</button></div></div>` : '<div class="editor-empty">Your catalog is empty. Add a product to start.</div>'}</div>`;
     }
     $("#content-fields").innerHTML = html;
+    updateFontSamples();
     updatePromisePreviews();
+  }
+  function updateFontSamples() {
+    document.querySelectorAll("[data-font-sample]").forEach(sample => {
+      const sizes = doc.typography[sample.dataset.fontSample];
+      const value = sizes.desktop ?? sizes.mobile ?? 24;
+      sample.style.fontSize = `${Math.max(10, Math.min(72, Number(value) || 24))}px`;
+    });
   }
   function productList() {
     const matches = doc.products.map((p, i) => ({ p, i })).filter(({ p }) => `${p.name} ${p.brand} ${p.id}`.toLowerCase().includes(query.toLowerCase()));
@@ -134,6 +145,10 @@
     const input = event.target;
     if (input.id === "catalog-search") { query = input.value; $("#catalog-list").innerHTML = productList(); return; }
     if (!input.dataset.bind) return;
+    if (input.dataset.bind.startsWith("typography.")) {
+      set(input.dataset.bind, input.value === "" ? null : Number(input.value));
+      updateFontSamples(); return;
+    }
     set(input.dataset.bind, input.type === "checkbox" ? input.checked : input.type === "number" ? (input.dataset.bind.endsWith(".stock") && input.value === "" ? null : Number(input.value)) : input.value);
     if (input.dataset.bind.startsWith("homepage.promises.")) updatePromisePreviews();
     if (input.dataset.bind.endsWith(".fullImageMode") || input.dataset.bind.endsWith(".wide")) { render(); return; }
@@ -174,6 +189,8 @@
   document.addEventListener("click", event => {
     if (busy || !doc) return;
     const target = event.target.closest("button"); if (!target) return;
+    if (target.hasAttribute("data-reset-fonts")) { set("typography", {}); render(); return; }
+    if (target.dataset.resetFont) { set(`typography.${target.dataset.resetFont}`, {}); render(); return; }
     if (target.dataset.promiseIcon) {
       const [i, icon] = target.dataset.promiseIcon.split(":");
       if (Object.hasOwn(cms.promiseIcons, icon)) { set(`homepage.promises.${Number(i)}.icon`, icon); updatePromisePreviews(); }
